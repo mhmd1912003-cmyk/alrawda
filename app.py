@@ -4,9 +4,9 @@ import sqlite3, os, urllib.parse
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'rawda-secret-2024')
 
-ADMIN_TOKEN   = os.environ.get('ADMIN_TOKEN', '1912003')
+ADMIN_TOKEN   = os.environ.get('ADMIN_TOKEN', 'rawda2024xK9')
 # ✏️ غيّر الرقم ده لرقمك — بدون + وبدون مسافات
-WHATSAPP_NUM  = os.environ.get('WHATSAPP_NUM', '201094918310')
+WHATSAPP_NUM  = os.environ.get('WHATSAPP_NUM', '201000000000')
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'rawda.db')
 

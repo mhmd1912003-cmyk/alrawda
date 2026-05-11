@@ -3,65 +3,143 @@
 
 {% block extra_styles %}
 <style>
-    .admin-header { background:linear-gradient(135deg,var(--surface) 0%,rgba(240,165,0,.05) 100%); border-bottom:1px solid var(--border); padding:2.5rem 2rem 2rem; }
-    .admin-header-inner { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
-    .admin-title { font-size:1.8rem; font-weight:900; }
+    /* ══ ADMIN HEADER ══ */
+    .admin-header {
+        background:linear-gradient(135deg,var(--surface) 0%,rgba(240,165,0,.05) 100%);
+        border-bottom:1px solid var(--border); padding:1.2rem 1rem 1rem;
+    }
+    .admin-header-inner {
+        display:flex; align-items:center; justify-content:space-between;
+        gap:.8rem; flex-wrap:wrap;
+    }
+    .admin-title { font-size:1.4rem; font-weight:900; }
     .admin-title span { color:var(--accent); }
+    .admin-header p { color:var(--text-muted); font-size:.82rem; margin-top:2px; }
 
-    /* TABS */
-    .admin-tabs { max-width:1200px; margin:1.5rem auto 0; padding:0 2rem; display:flex; gap:8px; border-bottom:1px solid var(--border); }
-    .tab-btn { padding:10px 22px; background:none; border:none; border-bottom:2px solid transparent; color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:700; font-size:.95rem; cursor:pointer; transition:all .2s; margin-bottom:-1px; }
+    /* ══ TABS ══ */
+    .admin-tabs {
+        padding:0 1rem; display:flex; gap:4px;
+        border-bottom:1px solid var(--border); overflow-x:auto; -webkit-overflow-scrolling:touch;
+    }
+    .admin-tabs::-webkit-scrollbar { display:none; }
+    .tab-btn {
+        padding:10px 16px; background:none; border:none; border-bottom:2px solid transparent;
+        color:var(--text-muted); font-family:'Cairo',sans-serif; font-weight:700; font-size:.88rem;
+        cursor:pointer; transition:all .2s; margin-bottom:-1px; white-space:nowrap;
+        min-height:var(--tap-min); display:flex; align-items:center;
+    }
     .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
-    .tab-btn:hover { color:var(--text); }
 
-    /* STATS */
-    .admin-stats { display:flex; gap:1rem; max-width:1200px; margin:1.5rem auto; padding:0 2rem; flex-wrap:wrap; }
-    .admin-stat { flex:1; min-width:130px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.2rem; text-align:center; }
-    .admin-stat .num { font-size:2rem; font-weight:900; }
-    .admin-stat .lbl { font-size:.8rem; color:var(--text-muted); }
+    /* ══ STATS: 2x2 grid on mobile ══ */
+    .admin-stats {
+        display:grid; grid-template-columns:1fr 1fr; gap:.7rem;
+        padding:1rem 1rem;
+    }
+    .admin-stat {
+        background:var(--surface); border:1px solid var(--border); border-radius:12px;
+        padding:.9rem .7rem; text-align:center;
+    }
+    .admin-stat .num { font-size:1.6rem; font-weight:900; line-height:1; }
+    .admin-stat .lbl { font-size:.72rem; color:var(--text-muted); margin-top:3px; }
 
-    /* TABLE WRAP */
-    .table-wrap { max-width:1200px; margin:0 auto; padding:0 2rem 2rem; }
-    .table-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:10px; }
-    .table-toolbar h3 { font-size:1.1rem; font-weight:800; color:var(--text-muted); }
-    .search-box { padding:9px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.9rem; width:250px; outline:none; direction:rtl; }
+    /* ══ TABLE WRAP ══ */
+    .table-wrap { padding:0 1rem 2rem; }
+    .table-toolbar {
+        display:flex; align-items:center; justify-content:space-between;
+        margin-bottom:.8rem; gap:8px; flex-wrap:wrap;
+    }
+    .table-toolbar h3 { font-size:.95rem; font-weight:800; color:var(--text-muted); }
+    .search-box {
+        padding:9px 14px; background:var(--surface); border:1px solid var(--border);
+        border-radius:10px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.88rem;
+        width:100%; outline:none; direction:rtl; min-height:var(--tap-min);
+    }
     .search-box:focus { border-color:var(--accent); }
 
-    table { width:100%; border-collapse:collapse; background:var(--surface); border-radius:16px; overflow:hidden; border:1px solid var(--border); }
-    thead tr { background:var(--surface2); border-bottom:1px solid var(--border); }
-    th { padding:14px 12px; text-align:right; font-size:.8rem; font-weight:700; color:var(--text-muted); white-space:nowrap; }
-    td { padding:12px 12px; font-size:.87rem; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:middle; }
-    tbody tr:last-child td { border-bottom:none; }
-    tbody tr:hover { background:rgba(240,165,0,.03); }
-
-    .td-name { font-weight:700; max-width:180px; }
-    .td-brand { color:var(--accent); font-weight:700; font-size:.8rem; }
-    .cond-badge { padding:4px 12px; border-radius:20px; font-size:.75rem; font-weight:800; display:inline-block; white-space:nowrap; }
+    /* ══ MOBILE CARDS (replaces table on small screens) ══ */
+    .mobile-row-cards { display:flex; flex-direction:column; gap:.7rem; }
+    .admin-card {
+        background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px;
+    }
+    .admin-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:8px; }
+    .admin-card-name { font-weight:800; font-size:.9rem; line-height:1.3; }
+    .admin-card-brand { font-size:.72rem; color:var(--accent); font-weight:700; margin-top:2px; }
+    .admin-card-meta { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+    .cond-badge { padding:3px 10px; border-radius:20px; font-size:.7rem; font-weight:800; display:inline-block; }
     .cond-new { background:rgba(0,200,150,.15); color:var(--new-color); }
     .cond-like_new { background:rgba(77,171,247,.15); color:var(--like-new-color); }
     .cond-used { background:rgba(255,140,66,.15); color:var(--used-color); }
+    .admin-card-price { font-weight:900; color:var(--accent); font-size:.9rem; }
+    .admin-card-spec { background:var(--surface2); color:var(--text-muted); padding:2px 7px; border-radius:5px; font-size:.68rem; font-weight:600; }
+    .admin-card-actions { display:flex; gap:6px; flex-wrap:wrap; }
+    .admin-card-actions .btn { flex:1; min-width:70px; font-size:.78rem; padding:8px 6px; min-height:38px; }
+
+    /* ══ DESKTOP TABLE (hidden on mobile) ══ */
+    .desktop-table-wrap { display:none; }
+    table { width:100%; border-collapse:collapse; background:var(--surface); border-radius:14px; overflow:hidden; border:1px solid var(--border); }
+    thead tr { background:var(--surface2); border-bottom:1px solid var(--border); }
+    th { padding:12px 10px; text-align:right; font-size:.78rem; font-weight:700; color:var(--text-muted); white-space:nowrap; }
+    td { padding:10px 10px; font-size:.84rem; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:middle; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover { background:rgba(240,165,0,.03); }
+    .td-name { font-weight:700; max-width:160px; }
+    .td-brand { color:var(--accent); font-weight:700; font-size:.78rem; }
     .price-cell { font-weight:800; color:var(--accent); white-space:nowrap; }
-    .actions-cell { display:flex; gap:6px; justify-content:flex-end; flex-wrap:wrap; }
+    .actions-cell { display:flex; gap:5px; justify-content:flex-end; flex-wrap:wrap; }
 
-    /* SELL MODAL */
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; align-items:center; justify-content:center; }
+    /* ══ SELL MODAL ══ */
+    .modal-overlay {
+        display:none; position:fixed; inset:0; background:rgba(0,0,0,.75);
+        z-index:200; align-items:flex-end; justify-content:center;
+        padding-bottom:env(safe-area-inset-bottom, 0);
+    }
     .modal-overlay.open { display:flex; }
-    .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2rem; width:90%; max-width:420px; }
-    .modal-box h3 { font-size:1.2rem; font-weight:900; margin-bottom:.5rem; }
-    .modal-box p { color:var(--text-muted); font-size:.9rem; margin-bottom:1.2rem; }
-    .modal-box textarea { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:10px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.9rem; resize:vertical; min-height:70px; direction:rtl; outline:none; }
-    .modal-actions { display:flex; gap:10px; margin-top:1rem; justify-content:flex-end; }
-    .btn-close-modal { background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); padding:9px 18px; border-radius:10px; cursor:pointer; font-family:'Cairo',sans-serif; font-weight:700; }
+    .modal-box {
+        background:var(--surface); border:1px solid var(--border);
+        border-radius:20px 20px 0 0; padding:1.5rem 1.2rem;
+        width:100%; max-width:500px;
+        animation:slideUp .25s ease;
+    }
+    @keyframes slideUp { from { transform:translateY(60px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    .modal-box h3 { font-size:1.1rem; font-weight:900; margin-bottom:.35rem; }
+    .modal-box p { color:var(--text-muted); font-size:.88rem; margin-bottom:1rem; }
+    .modal-box textarea {
+        width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+        padding:10px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.9rem;
+        resize:vertical; min-height:70px; direction:rtl; outline:none;
+    }
+    .modal-actions { display:flex; gap:8px; margin-top:1rem; }
+    .modal-actions .btn { flex:1; justify-content:center; }
+    .btn-close-modal {
+        background:var(--surface2); color:var(--text-muted); border:1px solid var(--border);
+        padding:11px 16px; border-radius:10px; cursor:pointer; font-family:'Cairo',sans-serif;
+        font-weight:700; font-size:.9rem; min-height:var(--tap-min); flex:1; display:flex;
+        align-items:center; justify-content:center;
+    }
 
-    /* HISTORY TABLE */
-    .history-section { display:none; }
-    .history-section.active { display:block; }
-    .sold-badge { background:rgba(0,200,150,.12); color:var(--new-color); border:1px solid rgba(0,200,150,.25); padding:4px 12px; border-radius:20px; font-size:.75rem; font-weight:800; }
-    .total-revenue { font-size:1.4rem; font-weight:900; color:var(--accent); }
-
+    /* HISTORY */
     .tab-section { display:none; }
     .tab-section.active { display:block; }
-    .empty-admin { text-align:center; padding:4rem; color:var(--text-muted); }
+    .sold-badge { background:rgba(0,200,150,.12); color:var(--new-color); border:1px solid rgba(0,200,150,.25); padding:3px 10px; border-radius:20px; font-size:.7rem; font-weight:800; }
+    .total-revenue { font-size:1.4rem; font-weight:900; color:var(--accent); }
+    .empty-admin { text-align:center; padding:3rem 1rem; color:var(--text-muted); }
+
+    /* ══ DESKTOP OVERRIDES ══ */
+    @media (min-width: 768px) {
+        .admin-header { padding:2rem 2rem 1.5rem; }
+        .admin-title { font-size:1.8rem; }
+        .admin-tabs { padding:0 2rem; }
+        .admin-stats { grid-template-columns: repeat(4, 1fr); padding:1.5rem 2rem; gap:1rem; }
+        .admin-stat .num { font-size:2rem; }
+        .table-wrap { padding:0 2rem 2rem; }
+        .search-box { width:250px; }
+        .table-toolbar { flex-wrap:nowrap; }
+        /* Show table, hide cards */
+        .mobile-row-cards { display:none; }
+        .desktop-table-wrap { display:block; }
+        .modal-overlay { align-items:center; }
+        .modal-box { border-radius:20px; }
+    }
 </style>
 {% endblock %}
 
@@ -70,23 +148,21 @@
     <div class="admin-header-inner">
         <div>
             <h1 class="admin-title">⚙️ لوحة <span>الإدارة</span></h1>
-            <p style="color:var(--text-muted);margin-top:4px;font-size:.9rem">إدارة وتحكم كامل في قائمة الموبايلات</p>
+            <p>إدارة وتحكم كامل في قائمة الموبايلات</p>
         </div>
-        <a href="/admin/{{ token }}/add" class="btn btn-primary">＋ إضافة موبايل جديد</a>
+        <a href="/admin/{{ token }}/add" class="btn btn-primary">＋ إضافة</a>
     </div>
 </div>
 
-<!-- TABS -->
 <div class="admin-tabs">
-    <button class="tab-btn active" onclick="showTab('inventory')">📦 المخزون ({{ mobiles|length }})</button>
-    <button class="tab-btn" onclick="showTab('history')" id="history-tab-btn">🏷️ سجل المبيعات ({{ sales|length }})</button>
+    <button class="tab-btn active" onclick="showTab('inventory',this)">📦 المخزون ({{ mobiles|length }})</button>
+    <button class="tab-btn" onclick="showTab('history',this)">🏷️ المبيعات ({{ sales|length }})</button>
 </div>
 
-<!-- ══════════════ TAB: INVENTORY ══════════════ -->
+<!-- ══ INVENTORY TAB ══ -->
 <div id="tab-inventory" class="tab-section active">
-    <!-- STATS -->
     <div class="admin-stats">
-        <div class="admin-stat"><div class="num">{{ mobiles|length }}</div><div class="lbl">إجمالي المخزون</div></div>
+        <div class="admin-stat"><div class="num">{{ mobiles|length }}</div><div class="lbl">المخزون</div></div>
         <div class="admin-stat"><div class="num" style="color:var(--new-color)">{{ mobiles|selectattr('condition','eq','new')|list|length }}</div><div class="lbl">✨ جديد</div></div>
         <div class="admin-stat"><div class="num" style="color:var(--like-new-color)">{{ mobiles|selectattr('condition','eq','like_new')|list|length }}</div><div class="lbl">💎 شبه جديد</div></div>
         <div class="admin-stat"><div class="num" style="color:var(--used-color)">{{ mobiles|selectattr('condition','eq','used')|list|length }}</div><div class="lbl">🔄 مستعمل</div></div>
@@ -95,9 +171,38 @@
     <div class="table-wrap">
         <div class="table-toolbar">
             <h3>📋 قائمة الموبايلات</h3>
-            <input type="text" class="search-box" id="searchInput" placeholder="🔍 ابحث..." onkeyup="filterTable('mobilesTable','searchInput')">
+            <input type="text" class="search-box" id="searchInput" placeholder="🔍 ابحث..." oninput="filterCards('mobileCards','searchInput'); filterTable('mobilesTable','searchInput')">
         </div>
         {% if mobiles %}
+        <!-- Mobile Cards -->
+        <div class="mobile-row-cards" id="mobileCards">
+            {% for m in mobiles %}
+            <div class="admin-card" data-search="{{ (m.name + ' ' + m.brand + ' ' + m.condition)|lower }}">
+                <div class="admin-card-top">
+                    <div>
+                        <div class="admin-card-name">{{ m.name }}</div>
+                        <div class="admin-card-brand">{{ m.brand }}</div>
+                    </div>
+                    <span class="cond-badge cond-{{ m.condition }}">{% if m.condition=='new' %}✨ جديد{% elif m.condition=='like_new' %}💎 شبه جديد{% else %}🔄 مستعمل{% endif %}</span>
+                </div>
+                <div class="admin-card-meta">
+                    <span class="admin-card-price">{{ "{:,.0f}".format(m.price) }} ج</span>
+                    {% if m.storage %}<span class="admin-card-spec">{{ m.storage }}</span>{% endif %}
+                    {% if m.ram %}<span class="admin-card-spec">{{ m.ram }}</span>{% endif %}
+                    {% if m.youtube_url %}<a href="{{ m.youtube_url }}" target="_blank" style="color:#ff4444;font-size:.75rem">▶ يوتيوب</a>{% endif %}
+                </div>
+                <div class="admin-card-actions">
+                    <a href="/admin/{{ token }}/edit/{{ m.id }}" class="btn btn-edit btn-sm">✏️ تعديل</a>
+                    <button class="btn btn-primary btn-sm" onclick="openSellModal({{ m.id }}, '{{ m.name|replace("'","\\'")|e }}')">💰 بيع</button>
+                    <form method="POST" action="/admin/{{ token }}/delete/{{ m.id }}" style="display:contents" onsubmit="return confirm('حذف «{{ m.name }}»؟')">
+                        <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Desktop Table -->
+        <div class="desktop-table-wrap">
         <table id="mobilesTable">
             <thead><tr>
                 <th>#</th><th>الجهاز</th><th>الماركة</th><th>الحالة</th><th>السعر</th><th>تخزين</th><th>رام</th><th>يوتيوب</th><th>الإجراءات</th>
@@ -105,14 +210,14 @@
             <tbody>
             {% for m in mobiles %}
             <tr>
-                <td style="color:var(--text-muted);font-size:.8rem">{{ loop.index }}</td>
+                <td style="color:var(--text-muted);font-size:.78rem">{{ loop.index }}</td>
                 <td class="td-name">{{ m.name }}</td>
                 <td class="td-brand">{{ m.brand }}</td>
                 <td><span class="cond-badge cond-{{ m.condition }}">{% if m.condition=='new' %}✨ جديد{% elif m.condition=='like_new' %}💎 شبه جديد{% else %}🔄 مستعمل{% endif %}</span></td>
                 <td class="price-cell">{{ "{:,.0f}".format(m.price) }} ج</td>
                 <td style="color:var(--text-muted)">{{ m.storage or '—' }}</td>
                 <td style="color:var(--text-muted)">{{ m.ram or '—' }}</td>
-                <td>{% if m.youtube_url %}<a href="{{ m.youtube_url }}" target="_blank" style="color:#ff4444;font-size:.8rem">▶ رابط</a>{% else %}<span style="color:var(--text-muted);font-size:.8rem">—</span>{% endif %}</td>
+                <td>{% if m.youtube_url %}<a href="{{ m.youtube_url }}" target="_blank" style="color:#ff4444;font-size:.8rem">▶ رابط</a>{% else %}<span style="color:var(--text-muted)">—</span>{% endif %}</td>
                 <td>
                     <div class="actions-cell">
                         <a href="/admin/{{ token }}/edit/{{ m.id }}" class="btn btn-edit btn-sm">✏️ تعديل</a>
@@ -126,6 +231,7 @@
             {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
         <div class="empty-admin">
             <div style="font-size:3rem;margin-bottom:1rem">📦</div>
@@ -135,22 +241,47 @@
     </div>
 </div>
 
-<!-- ══════════════ TAB: HISTORY ══════════════ -->
-<div id="tab-history" class="tab-section" id="history">
+<!-- ══ HISTORY TAB ══ -->
+<div id="tab-history" class="tab-section">
     {% set total_rev = namespace(v=0) %}
     {% for s in sales %}{% set total_rev.v = total_rev.v + s.price %}{% endfor %}
 
     <div class="admin-stats">
         <div class="admin-stat"><div class="num">{{ sales|length }}</div><div class="lbl">إجمالي المبيعات</div></div>
-        <div class="admin-stat"><div class="num total-revenue">{{ "{:,.0f}".format(total_rev.v) }}</div><div class="lbl">💰 إجمالي الإيرادات (جنيه)</div></div>
+        <div class="admin-stat" style="grid-column:1/-1"><div class="num total-revenue">{{ "{:,.0f}".format(total_rev.v) }}</div><div class="lbl">💰 إجمالي الإيرادات (جنيه)</div></div>
     </div>
 
     <div class="table-wrap">
         <div class="table-toolbar">
-            <h3>🏷️ سجل الموبايلات المباعة</h3>
-            <input type="text" class="search-box" id="searchSales" placeholder="🔍 ابحث في المبيعات..." onkeyup="filterTable('salesTable','searchSales')">
+            <h3>🏷️ سجل المبيعات</h3>
+            <input type="text" class="search-box" id="searchSales" placeholder="🔍 ابحث..." oninput="filterCards('salesCards','searchSales'); filterTable('salesTable','searchSales')">
         </div>
         {% if sales %}
+        <!-- Mobile Cards -->
+        <div class="mobile-row-cards" id="salesCards">
+            {% for s in sales %}
+            <div class="admin-card" data-search="{{ (s.name + ' ' + s.brand)|lower }}">
+                <div class="admin-card-top">
+                    <div>
+                        <div class="admin-card-name">{{ s.name }}</div>
+                        <div class="admin-card-brand">{{ s.brand }}</div>
+                    </div>
+                    <span class="sold-badge">مباع</span>
+                </div>
+                <div class="admin-card-meta">
+                    <span class="admin-card-price">{{ "{:,.0f}".format(s.price) }} ج</span>
+                    <span class="cond-badge cond-{{ s.condition }}">{% if s.condition=='new' %}✨{% elif s.condition=='like_new' %}💎{% else %}🔄{% endif %}</span>
+                    <span style="font-size:.7rem;color:var(--text-muted)">{{ s.sold_at[:10] }}</span>
+                </div>
+                {% if s.notes %}<div style="font-size:.75rem;color:var(--text-muted);margin-bottom:8px">{{ s.notes }}</div>{% endif %}
+                <form method="POST" action="/admin/{{ token }}/sales/delete/{{ s.id }}" onsubmit="return confirm('حذف هذا السجل؟')">
+                    <button type="submit" class="btn btn-danger btn-sm">🗑️ حذف السجل</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Desktop Table -->
+        <div class="desktop-table-wrap">
         <table id="salesTable">
             <thead><tr>
                 <th>#</th><th>الجهاز</th><th>الماركة</th><th>الحالة</th><th>السعر</th><th>ملاحظات</th><th>تاريخ البيع</th><th>حذف</th>
@@ -158,15 +289,15 @@
             <tbody>
             {% for s in sales %}
             <tr>
-                <td style="color:var(--text-muted);font-size:.8rem">{{ loop.index }}</td>
+                <td style="color:var(--text-muted);font-size:.78rem">{{ loop.index }}</td>
                 <td class="td-name">{{ s.name }}</td>
                 <td class="td-brand">{{ s.brand }}</td>
                 <td><span class="cond-badge cond-{{ s.condition }}">{% if s.condition=='new' %}✨ جديد{% elif s.condition=='like_new' %}💎 شبه جديد{% else %}🔄 مستعمل{% endif %}</span></td>
                 <td class="price-cell">{{ "{:,.0f}".format(s.price) }} ج</td>
-                <td style="color:var(--text-muted);font-size:.82rem">{{ s.notes or '—' }}</td>
-                <td style="color:var(--text-muted);font-size:.8rem;white-space:nowrap">{{ s.sold_at[:16] }}</td>
+                <td style="color:var(--text-muted);font-size:.8rem">{{ s.notes or '—' }}</td>
+                <td style="color:var(--text-muted);font-size:.78rem;white-space:nowrap">{{ s.sold_at[:16] }}</td>
                 <td>
-                    <form method="POST" action="/admin/{{ token }}/sales/delete/{{ s.id }}" onsubmit="return confirm('حذف هذا السجل من التاريخ؟')">
+                    <form method="POST" action="/admin/{{ token }}/sales/delete/{{ s.id }}" onsubmit="return confirm('حذف هذا السجل؟')">
                         <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
                     </form>
                 </td>
@@ -174,23 +305,24 @@
             {% endfor %}
             </tbody>
         </table>
+        </div>
         {% else %}
         <div class="empty-admin">
             <div style="font-size:3rem;margin-bottom:1rem">🏷️</div>
-            <p>لا يوجد مبيعات مسجلة بعد — استخدم زر <strong>💰 بيع</strong> في المخزون</p>
+            <p>لا يوجد مبيعات بعد — استخدم زر <strong>💰 بيع</strong> في المخزون</p>
         </div>
         {% endif %}
     </div>
 </div>
 
 <!-- SELL MODAL -->
-<div class="modal-overlay" id="sellModal">
+<div class="modal-overlay" id="sellModal" onclick="if(event.target===this)closeModal()">
     <div class="modal-box">
         <h3>💰 تسجيل بيع</h3>
-        <p id="modalMobileName" style="color:var(--accent);font-weight:700;font-size:1rem;margin-bottom:.5rem"></p>
-        <p>سيتم نقل الجهاز من المخزون إلى سجل المبيعات تلقائياً.</p>
+        <p id="modalMobileName" style="color:var(--accent);font-weight:700;font-size:.95rem;margin-bottom:.4rem"></p>
+        <p>سيتم نقل الجهاز من المخزون إلى سجل المبيعات.</p>
         <form id="sellForm" method="POST">
-            <label style="font-size:.85rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:6px">ملاحظات (اختياري)</label>
+            <label style="font-size:.82rem;font-weight:700;color:var(--text-muted);display:block;margin-bottom:5px">ملاحظات (اختياري)</label>
             <textarea name="notes" placeholder="مثال: تم البيع لـ أحمد — دفع كاش"></textarea>
             <div class="modal-actions">
                 <button type="button" class="btn-close-modal" onclick="closeModal()">إلغاء</button>
@@ -201,15 +333,23 @@
 </div>
 
 <script>
-function showTab(name) {
+function showTab(name, btn) {
     document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
+    btn.classList.add('active');
+}
+function filterCards(containerId, inputId) {
+    const q = document.getElementById(inputId).value.toLowerCase();
+    document.querySelectorAll('#' + containerId + ' .admin-card').forEach(card => {
+        card.style.display = card.dataset.search.includes(q) ? '' : 'none';
+    });
 }
 function filterTable(tableId, inputId) {
     const q = document.getElementById(inputId).value.toLowerCase();
-    document.querySelectorAll('#' + tableId + ' tbody tr').forEach(row => {
+    const tbl = document.getElementById(tableId);
+    if (!tbl) return;
+    tbl.querySelectorAll('tbody tr').forEach(row => {
         row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
 }
@@ -217,11 +357,12 @@ function openSellModal(id, name) {
     document.getElementById('modalMobileName').textContent = '📱 ' + name;
     document.getElementById('sellForm').action = '/admin/{{ token }}/sell/' + id;
     document.getElementById('sellModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
 }
 function closeModal() {
     document.getElementById('sellModal').classList.remove('open');
+    document.body.style.overflow = '';
 }
-// لو جاي من anchor #history افتح التاب
 if (window.location.hash === '#history') {
     document.getElementById('tab-inventory').classList.remove('active');
     document.getElementById('tab-history').classList.add('active');

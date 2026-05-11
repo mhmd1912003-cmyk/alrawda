@@ -2,22 +2,35 @@
 {% block title %}تعديل موبايل — الروضة{% endblock %}
 {% block extra_styles %}
 <style>
-    .form-page { max-width:700px; margin:3rem auto; padding:0 1.5rem; }
-    .form-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2.5rem; }
-    .form-title { font-size:1.6rem; font-weight:900; margin-bottom:.5rem; }
+    .form-page { padding:1.2rem 1rem 3rem; }
+    .form-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:1.5rem 1.2rem; }
+    .form-title { font-size:1.35rem; font-weight:900; margin-bottom:.35rem; }
     .form-title span { color:#4dabf7; }
-    .form-subtitle { color:var(--text-muted); font-size:.9rem; margin-bottom:2rem; }
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
-    .form-group { display:flex; flex-direction:column; gap:6px; }
-    .form-group.full { grid-column:1/-1; }
-    label { font-size:.85rem; font-weight:700; color:var(--text-muted); }
-    input,select,textarea { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s; direction:rtl; }
+    .form-subtitle { color:var(--text-muted); font-size:.85rem; margin-bottom:1.5rem; }
+    .form-grid { display:flex; flex-direction:column; gap:1rem; }
+    .form-group { display:flex; flex-direction:column; gap:5px; }
+    label { font-size:.82rem; font-weight:700; color:var(--text-muted); }
+    input,select,textarea {
+        background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+        padding:12px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:1rem;
+        outline:none; transition:border-color .2s; direction:rtl;
+        -webkit-appearance:none; min-height:var(--tap-min);
+    }
     input:focus,select:focus,textarea:focus { border-color:#4dabf7; }
     textarea { resize:vertical; min-height:90px; }
-    .form-actions { display:flex; gap:12px; margin-top:2rem; justify-content:flex-end; }
+    select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a8599' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:left 12px center; }
+    .form-actions { display:flex; flex-direction:column; gap:10px; margin-top:1.5rem; }
+    .form-actions .btn { width:100%; justify-content:center; }
     .btn-cancel { background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); }
     .btn-save { background:linear-gradient(135deg,#4dabf7,#339af0); color:#fff; }
-    .btn-save:hover { transform:translateY(-2px); }
+    @media (min-width:600px) {
+        .form-page { max-width:700px; margin:2.5rem auto; }
+        .form-card { padding:2.5rem; }
+        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+        .form-group.full { grid-column:1/-1; }
+        .form-actions { flex-direction:row; justify-content:flex-end; }
+        .form-actions .btn { width:auto; }
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -27,7 +40,7 @@
         <p class="form-subtitle">{{ mobile.name }}</p>
         <form method="POST">
             <div class="form-grid">
-                <div class="form-group full"><label>📱 اسم الجهاز *</label><input type="text" name="name" value="{{ mobile.name }}" required></div>
+                <div class="form-group full"><label>📱 اسم الجهاز *</label><input type="text" name="name" value="{{ mobile.name }}" required autocomplete="off"></div>
                 <div class="form-group"><label>🏷️ الماركة *</label>
                     <select name="brand" required>{% for b in ['Samsung','Apple','Realme','Xiaomi','Oppo','Huawei','Vivo','Nokia','Other'] %}<option value="{{ b }}" {% if mobile.brand==b %}selected{% endif %}>{{ b }}</option>{% endfor %}</select>
                 </div>
@@ -38,7 +51,7 @@
                         <option value="used" {% if mobile.condition=='used' %}selected{% endif %}>🔄 مستعمل</option>
                     </select>
                 </div>
-                <div class="form-group"><label>💰 السعر (جنيه) *</label><input type="number" name="price" value="{{ mobile.price }}" min="0" step="0.01" required></div>
+                <div class="form-group"><label>💰 السعر (جنيه) *</label><input type="number" name="price" value="{{ mobile.price }}" min="0" step="0.01" required inputmode="decimal"></div>
                 <div class="form-group"><label>🎨 اللون</label><input type="text" name="color" value="{{ mobile.color or '' }}"></div>
                 <div class="form-group"><label>💾 التخزين</label>
                     <select name="storage">{% for s in ['','32GB','64GB','128GB','256GB','512GB','1TB'] %}<option value="{{ s }}" {% if mobile.storage==s %}selected{% endif %}>{{ s or '—' }}</option>{% endfor %}</select>
@@ -46,8 +59,8 @@
                 <div class="form-group"><label>⚡ الرام</label>
                     <select name="ram">{% for r in ['','3GB','4GB','6GB','8GB','12GB','16GB'] %}<option value="{{ r }}" {% if mobile.ram==r %}selected{% endif %}>{{ r or '—' }}</option>{% endfor %}</select>
                 </div>
-                <div class="form-group full"><label>🖼️ رابط الصورة</label><input type="text" name="image_url" value="{{ mobile.image_url or '' }}"></div>
-                <div class="form-group full"><label>▶️ رابط مراجعة يوتيوب</label><input type="text" name="youtube_url" value="{{ mobile.youtube_url or '' }}" placeholder="https://youtube.com/watch?v=..."></div>
+                <div class="form-group full"><label>🖼️ رابط الصورة</label><input type="url" name="image_url" value="{{ mobile.image_url or '' }}" inputmode="url"></div>
+                <div class="form-group full"><label>▶️ رابط مراجعة يوتيوب</label><input type="url" name="youtube_url" value="{{ mobile.youtube_url or '' }}" placeholder="https://youtube.com/watch?v=..." inputmode="url"></div>
                 <div class="form-group full"><label>📝 الوصف</label><textarea name="description">{{ mobile.description or '' }}</textarea></div>
             </div>
             <div class="form-actions">
