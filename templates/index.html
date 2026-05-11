@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}الروضة للموبايلات — عروض حصرية{% endblock %}
+
+{% block extra_styles %}
+<style>
+    :root {
+        --wa: #25d366;
+        --yt: #ff0000;
+    }
+    /* HERO */
+    .hero { position:relative; padding:5rem 2rem 3rem; text-align:center; overflow:hidden; }
+    .hero::before {
+        content:''; position:absolute; top:-100px; left:50%; transform:translateX(-50%);
+        width:800px; height:800px;
+        background:radial-gradient(ellipse,rgba(240,165,0,0.08) 0%,transparent 70%);
+        pointer-events:none;
+    }
+    .hero-badge { display:inline-block; background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3); color:var(--accent); padding:6px 18px; border-radius:30px; font-size:.85rem; font-weight:700; margin-bottom:1.5rem; }
+    .hero h1 { font-size:clamp(2.2rem,5vw,3.8rem); font-weight:900; line-height:1.2; margin-bottom:1rem; }
+    .hero h1 .highlight { background:linear-gradient(135deg,var(--accent),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero p { color:var(--text-muted); font-size:1.1rem; max-width:500px; margin:0 auto 2.5rem; }
+    .stats-bar { display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; margin-bottom:3rem; }
+    .stat-item { text-align:center; padding:1rem 1.5rem; background:var(--surface); border:1px solid var(--border); border-radius:14px; min-width:100px; }
+    .stat-num { font-size:1.8rem; font-weight:900; color:var(--accent); }
+    .stat-label { font-size:.8rem; color:var(--text-muted); }
+
+    /* FILTER */
+    .filter-section { background:var(--surface); border-bottom:1px solid var(--border); padding:1.2rem 2rem; position:absolute; top:70px; z-index:50; }
+    .filter-inner { max-width:1300px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .filter-label { font-weight:700; color:var(--text-muted); font-size:.9rem; white-space:nowrap; }
+    .filter-pills { display:flex; gap:8px; flex-wrap:wrap; }
+    .pill { padding:7px 16px; border-radius:30px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; font-family:'Cairo',sans-serif; font-weight:600; font-size:.85rem; text-decoration:none; transition:all .2s; }
+    .pill:hover { border-color:var(--accent); color:var(--accent); }
+    .pill.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:700; }
+    .pill-new.active { background:var(--new-color); border-color:var(--new-color); }
+    .pill-like.active { background:var(--like-new-color); border-color:var(--like-new-color); }
+    .pill-used.active { background:var(--used-color); border-color:var(--used-color); }
+    .divider-pill { width:1px; height:24px; background:var(--border); align-self:center; }
+
+    /* CONTENT */
+    .content { max-width:1300px; margin:0 auto; padding:2rem; }
+    .condition-block { margin-bottom:4rem; }
+    .condition-header { display:flex; align-items:center; gap:16px; margin-bottom:2rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+    .condition-badge { padding:8px 20px; border-radius:30px; font-weight:800; font-size:1rem; }
+    .badge-new { background:rgba(0,200,150,.15); color:var(--new-color); border:1px solid rgba(0,200,150,.3); }
+    .badge-like_new { background:rgba(77,171,247,.15); color:var(--like-new-color); border:1px solid rgba(77,171,247,.3); }
+    .badge-used { background:rgba(255,140,66,.15); color:var(--used-color); border:1px solid rgba(255,140,66,.3); }
+    .condition-title { font-size:1.5rem; font-weight:900; }
+    .condition-count { margin-right:auto; color:var(--text-muted); font-size:.9rem; }
+    .brand-section { margin-bottom:2.5rem; }
+    .brand-header { display:flex; align-items:center; gap:12px; margin-bottom:1.2rem; }
+    .brand-name { font-size:1.1rem; font-weight:800; }
+    .brand-logo { width:36px; height:36px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .brand-count { background:var(--surface2); color:var(--text-muted); padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
+
+    /* GRID */
+    .mobiles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1.2rem; }
+
+    /* CARD */
+    .mobile-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden; transition:all .3s cubic-bezier(.34,1.56,.64,1); position:relative; display:flex; flex-direction:column; }
+    .mobile-card:hover { transform:translateY(-6px) scale(1.01); border-color:rgba(240,165,0,.4); box-shadow:0 20px 40px rgba(0,0,0,.4); }
+    .card-condition-strip { position:absolute; top:12px; right:12px; padding:4px 10px; border-radius:20px; font-size:.72rem; font-weight:800; z-index:2; }
+    .strip-new { background:var(--new-color); color:#000; }
+    .strip-like_new { background:var(--like-new-color); color:#000; }
+    .strip-used { background:var(--used-color); color:#000; }
+    .card-img-wrap { width:100%; height:180px; background:var(--surface2); display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
+    .card-img-wrap::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(transparent,var(--surface)); }
+    .card-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform .4s ease; }
+    .mobile-card:hover .card-img-wrap img { transform:scale(1.05); }
+    .card-img-placeholder { font-size:60px; opacity:.3; }
+    .card-body { padding:14px; flex:1; display:flex; flex-direction:column; }
+    .card-brand { font-size:.75rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+    .card-name { font-size:.95rem; font-weight:800; margin-bottom:8px; line-height:1.3; }
+    .card-specs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .spec-tag { background:var(--surface2); border:1px solid var(--border); padding:3px 8px; border-radius:6px; font-size:.72rem; color:var(--text-muted); font-weight:600; }
+    .card-desc { font-size:.78rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4; flex:1; }
+    .card-footer-row { display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); padding-top:10px; margin-top:auto; margin-bottom:10px; }
+    .card-price { font-size:1.1rem; font-weight:900; color:var(--accent); }
+    .card-price span { font-size:.7rem; color:var(--text-muted); font-weight:400; }
+    .card-color { font-size:.75rem; color:var(--text-muted); }
+
+    /* ACTION BUTTONS */
+    .card-actions { display:flex; gap:8px; }
+    .card-actions a { flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:9px 6px; border-radius:10px; font-family:'Cairo',sans-serif; font-weight:700; font-size:.82rem; text-decoration:none; transition:all .2s; border:none; cursor:pointer; }
+    .btn-wa { background:rgba(37,211,102,.12); color:var(--wa); border:1px solid rgba(37,211,102,.3); }
+    .btn-wa:hover { background:rgba(37,211,102,.25); transform:translateY(-2px); }
+    .btn-yt { background:rgba(255,0,0,.1); color:var(--yt); border:1px solid rgba(255,0,0,.25); }
+    .btn-yt:hover { background:rgba(255,0,0,.22); transform:translateY(-2px); }
+    .btn-yt.disabled { opacity:.35; pointer-events:none; cursor:default; }
+
+    /* EMPTY */
+    .empty-state { text-align:center; padding:5rem 2rem; color:var(--text-muted); }
+    .empty-state .icon { font-size:4rem; margin-bottom:1rem; opacity:.3; }
+    
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-badge">🌿 أهلاً بك في الروضة</div>
+    <h1>تسوّق أحدث الموبايلات<br><span class="highlight">بأفضل الأسعار</span></h1>
+    <p>جديد، شبه جديد، أو مستعمل — عندنا كل اللي تحتاجه بضمان الجودة</p>
+    <div class="stats-bar">
+        {% set total = namespace(n=0,new=0,like=0,used=0) %}
+        {% for cond,brands in grouped.items() %}{% for brand,items in brands.items() %}
+            {% set total.n = total.n + items|length %}
+            {% if cond=='new' %}{% set total.new = total.new + items|length %}{% endif %}
+            {% if cond=='like_new' %}{% set total.like = total.like + items|length %}{% endif %}
+            {% if cond=='used' %}{% set total.used = total.used + items|length %}{% endif %}
+        {% endfor %}{% endfor %}
+        <div class="stat-item"><div class="stat-num">{{ total.n }}</div><div class="stat-label">إجمالي الأجهزة</div></div>
+        <div class="stat-item"><div class="stat-num" style="color:var(--new-color)">{{ total.new }}</div><div class="stat-label">✨ جديد</div></div>
+        <div class="stat-item"><div class="stat-num" style="color:var(--like-new-color)">{{ total.like }}</div><div class="stat-label">💎 شبه جديد</div></div>
+        <div class="stat-item"><div class="stat-num" style="color:var(--used-color)">{{ total.used }}</div><div class="stat-label">🔄 مستعمل</div></div>
+    </div>
+</div>
+
+<div class="filter-section">
+    <div class="filter-inner">
+        <span class="filter-label">🔍 الحالة:</span>
+        <div class="filter-pills">
+            <a href="/?condition=all&brand={{ brand_filter }}" class="pill {% if condition_filter=='all' %}active{% endif %}">الكل</a>
+            <a href="/?condition=new&brand={{ brand_filter }}" class="pill pill-new {% if condition_filter=='new' %}active{% endif %}">✨ جديد</a>
+            <a href="/?condition=like_new&brand={{ brand_filter }}" class="pill pill-like {% if condition_filter=='like_new' %}active{% endif %}">💎 شبه جديد</a>
+            <a href="/?condition=used&brand={{ brand_filter }}" class="pill pill-used {% if condition_filter=='used' %}active{% endif %}">🔄 مستعمل</a>
+        </div>
+        {% if brands %}<div class="divider-pill"></div>
+        <span class="filter-label">📱 الماركة:</span>
+        <div class="filter-pills">
+            <a href="/?condition={{ condition_filter }}&brand=all" class="pill {% if brand_filter=='all' %}active{% endif %}">الكل</a>
+            {% for b in brands %}<a href="/?condition={{ condition_filter }}&brand={{ b }}" class="pill {% if brand_filter==b %}active{% endif %}">{{ b }}</a>{% endfor %}
+        </div>{% endif %}
+    </div>
+</div>
+
+<div class="content">
+{% if grouped %}
+    {% set condition_order = ['new','like_new','used'] %}
+    {% set condition_names = {'new':'جديد','like_new':'شبه جديد','used':'مستعمل'} %}
+    {% set condition_icons = {'new':'✨','like_new':'💎','used':'🔄'} %}
+    {% set brand_icons = {'Samsung':'📱','Apple':'🍎','Realme':'🟠','Xiaomi':'⚡','Oppo':'🎯','Huawei':'🌸'} %}
+
+    {% for cond in condition_order %}{% if cond in grouped %}
+        {% set cond_brands = grouped[cond] %}
+        {% set cond_total = namespace(c=0) %}
+        {% for b,items in cond_brands.items() %}{% set cond_total.c = cond_total.c + items|length %}{% endfor %}
+
+        {% if condition_filter=='all' or condition_filter==cond %}
+        <div class="condition-block">
+            <div class="condition-header">
+                <span class="condition-badge badge-{{ cond }}">{{ condition_icons[cond] }} {{ condition_names[cond] }}</span>
+                <h2 class="condition-title">موبايلات {{ condition_names[cond] }}</h2>
+                <span class="condition-count">{{ cond_total.c }} جهاز</span>
+            </div>
+            {% for brand,items in cond_brands.items() %}{% if brand_filter=='all' or brand_filter==brand %}
+            <div class="brand-section">
+                <div class="brand-header">
+                    <div class="brand-logo">{{ brand_icons.get(brand,'📲') }}</div>
+                    <span class="brand-name">{{ brand }}</span>
+                    <span class="brand-count">{{ items|length }} جهاز</span>
+                </div>
+                <div class="mobiles-grid">
+                {% for m in items %}
+                {% set wa_msg = "مرحباً،%20أنا%20مهتم%20بـ%20" + m.name|urlencode + "%20--%20السعر:%20" + m.price|string + "%20جنيه%20--%20الحالة:%20" + m.condition %}
+                <div class="mobile-card">
+                    <div class="card-condition-strip strip-{{ m.condition }}">
+                        {% if m.condition=='new' %}جديد{% elif m.condition=='like_new' %}شبه جديد{% else %}مستعمل{% endif %}
+                    </div>
+                    <div class="card-img-wrap">
+                        {% if m.image_url %}
+                        <img src="{{ m.image_url }}" alt="{{ m.name }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="card-img-placeholder" style="display:none">📱</div>
+                        {% else %}
+                        <div class="card-img-placeholder">📱</div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="card-brand">{{ m.brand }}</div>
+                        <div class="card-name">{{ m.name }}</div>
+                        <div class="card-specs">
+                            {% if m.storage %}<span class="spec-tag">💾 {{ m.storage }}</span>{% endif %}
+                            {% if m.ram %}<span class="spec-tag">⚡ {{ m.ram }}</span>{% endif %}
+                            {% if m.color %}<span class="spec-tag">🎨 {{ m.color }}</span>{% endif %}
+                        </div>
+                        {% if m.description %}<div class="card-desc">{{ m.description[:70] }}{% if m.description|length > 70 %}...{% endif %}</div>{% endif %}
+                        <div class="card-footer-row">
+                            <div class="card-price">{{ "{:,.0f}".format(m.price) }} <span>جنيه</span></div>
+                        </div>
+                        <div class="card-actions">
+                            <a class="btn-wa"
+                               href="https://wa.me/{{ whatsapp_num }}?text={{ wa_msg }}"
+                               target="_blank" rel="noopener">
+                               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.054 23.61a.75.75 0 0 0 .916.919l5.79-1.484A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.68-.497-5.22-1.364l-.374-.217-3.88.994.994-3.842-.233-.384A9.962 9.962 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                               تواصل واتساب
+                            </a>
+                            <a class="btn-yt {% if not m.youtube_url %}disabled{% endif %}"
+                               href="{{ m.youtube_url or '#' }}"
+                               {% if m.youtube_url %}target="_blank" rel="noopener"{% endif %}>
+                               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                               {% if m.youtube_url %}مراجعة{% else %}قريباً{% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+            </div>
+            {% endif %}{% endfor %}
+        </div>
+        {% endif %}
+    {% endif %}{% endfor %}
+{% else %}
+    <div class="empty-state"><div class="icon">📱</div><p>لا توجد موبايلات متاحة حالياً</p></div>
+{% endif %}
+</div>
+{% endblock %}

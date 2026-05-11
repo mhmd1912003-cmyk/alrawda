@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}تعديل موبايل — الروضة{% endblock %}
+{% block extra_styles %}
+<style>
+    .form-page { max-width:700px; margin:3rem auto; padding:0 1.5rem; }
+    .form-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2.5rem; }
+    .form-title { font-size:1.6rem; font-weight:900; margin-bottom:.5rem; }
+    .form-title span { color:#4dabf7; }
+    .form-subtitle { color:var(--text-muted); font-size:.9rem; margin-bottom:2rem; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:.85rem; font-weight:700; color:var(--text-muted); }
+    input,select,textarea { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s; direction:rtl; }
+    input:focus,select:focus,textarea:focus { border-color:#4dabf7; }
+    textarea { resize:vertical; min-height:90px; }
+    .form-actions { display:flex; gap:12px; margin-top:2rem; justify-content:flex-end; }
+    .btn-cancel { background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); }
+    .btn-save { background:linear-gradient(135deg,#4dabf7,#339af0); color:#fff; }
+    .btn-save:hover { transform:translateY(-2px); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="form-page">
+    <div class="form-card">
+        <h1 class="form-title">✏️ تعديل <span>بيانات الجهاز</span></h1>
+        <p class="form-subtitle">{{ mobile.name }}</p>
+        <form method="POST">
+            <div class="form-grid">
+                <div class="form-group full"><label>📱 اسم الجهاز *</label><input type="text" name="name" value="{{ mobile.name }}" required></div>
+                <div class="form-group"><label>🏷️ الماركة *</label>
+                    <select name="brand" required>{% for b in ['Samsung','Apple','Realme','Xiaomi','Oppo','Huawei','Vivo','Nokia','Other'] %}<option value="{{ b }}" {% if mobile.brand==b %}selected{% endif %}>{{ b }}</option>{% endfor %}</select>
+                </div>
+                <div class="form-group"><label>✨ الحالة *</label>
+                    <select name="condition" required>
+                        <option value="new" {% if mobile.condition=='new' %}selected{% endif %}>✨ جديد</option>
+                        <option value="like_new" {% if mobile.condition=='like_new' %}selected{% endif %}>💎 شبه جديد</option>
+                        <option value="used" {% if mobile.condition=='used' %}selected{% endif %}>🔄 مستعمل</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>💰 السعر (جنيه) *</label><input type="number" name="price" value="{{ mobile.price }}" min="0" step="0.01" required></div>
+                <div class="form-group"><label>🎨 اللون</label><input type="text" name="color" value="{{ mobile.color or '' }}"></div>
+                <div class="form-group"><label>💾 التخزين</label>
+                    <select name="storage">{% for s in ['','32GB','64GB','128GB','256GB','512GB','1TB'] %}<option value="{{ s }}" {% if mobile.storage==s %}selected{% endif %}>{{ s or '—' }}</option>{% endfor %}</select>
+                </div>
+                <div class="form-group"><label>⚡ الرام</label>
+                    <select name="ram">{% for r in ['','3GB','4GB','6GB','8GB','12GB','16GB'] %}<option value="{{ r }}" {% if mobile.ram==r %}selected{% endif %}>{{ r or '—' }}</option>{% endfor %}</select>
+                </div>
+                <div class="form-group full"><label>🖼️ رابط الصورة</label><input type="text" name="image_url" value="{{ mobile.image_url or '' }}"></div>
+                <div class="form-group full"><label>▶️ رابط مراجعة يوتيوب</label><input type="text" name="youtube_url" value="{{ mobile.youtube_url or '' }}" placeholder="https://youtube.com/watch?v=..."></div>
+                <div class="form-group full"><label>📝 الوصف</label><textarea name="description">{{ mobile.description or '' }}</textarea></div>
+            </div>
+            <div class="form-actions">
+                <a href="/admin/{{ token }}" class="btn btn-cancel">إلغاء</a>
+                <button type="submit" class="btn btn-save">💾 حفظ التعديلات</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

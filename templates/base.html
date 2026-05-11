@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}الروضة للموبايلات{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a26;
+            --accent: #f0a500;
+            --accent2: #e05c00;
+            --gold: #ffd700;
+            --text: #f0ede6;
+            --text-muted: #8a8599;
+            --new-color: #00c896;
+            --like-new-color: #4dabf7;
+            --used-color: #ff8c42;
+            --border: rgba(240,165,0,0.15);
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        /* NAV */
+        nav {
+            background: rgba(10,10,15,0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .nav-logo .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .nav-logo .logo-text {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links { display: flex; gap: 8px; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background: var(--surface2);
+            color: var(--accent);
+        }
+
+        /* FLASH MESSAGES */
+        .flash-container {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            width: 90%;
+            max-width: 500px;
+        }
+        .flash {
+            background: var(--surface2);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--accent);
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(240,165,0,0.3); }
+        .btn-danger {
+            background: rgba(220,50,50,0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(220,50,50,0.3);
+        }
+        .btn-danger:hover { background: rgba(220,50,50,0.3); }
+        .btn-edit {
+            background: rgba(77,171,247,0.15);
+            color: #4dabf7;
+            border: 1px solid rgba(77,171,247,0.3);
+        }
+        .btn-edit:hover { background: rgba(77,171,247,0.3); }
+        .btn-sm { padding: 6px 14px; font-size: 0.82rem; }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+        footer span { color: var(--accent); }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+<nav>
+    <a href="/" class="nav-logo">
+        <div class="logo-icon">🌿</div>
+        <span class="logo-text">الروضة</span>
+    </a>
+    <div class="nav-links">
+        <a href="/" class="{% if request.endpoint == 'index' %}active{% endif %}">🏠 الرئيسية</a>
+        {# رابط الأدمن مش بيظهر للزوار العاديين — أنت بس بتحفظ الـ URL #}
+    </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-container">
+    {% for cat, msg in messages %}
+    <div class="flash">{{ msg }}</div>
+    {% endfor %}
+</div>
+<script>setTimeout(() => document.querySelector('.flash-container')?.remove(), 3000);</script>
+{% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<footer>
+    <p>جميع الحقوق محفوظة &copy; 2024 — <span>الروضة للموبايلات</span> 🌿</p>
+</footer>
+</body>
+</html>
