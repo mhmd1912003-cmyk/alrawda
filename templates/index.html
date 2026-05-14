@@ -3,184 +3,165 @@
 
 {% block extra_styles %}
 <style>
-    :root { --wa: #25d366; --yt: #ff0000; }
+    :root { --wa:#25d366; --yt:#ff0000; }
 
-    /* ══ HERO ══ */
-    .hero { position:relative; padding:2rem 1rem 1.5rem; text-align:center; overflow:hidden; }
-    .hero::before {
-        content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%);
-        width:min(600px,100vw); height:400px;
-        background:radial-gradient(ellipse,rgba(240,165,0,0.08) 0%,transparent 70%);
-        pointer-events:none;
-    }
-    .hero-badge {
-        display:inline-block; background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3);
-        color:var(--accent); padding:5px 14px; border-radius:30px; font-size:.8rem; font-weight:700; margin-bottom:1rem;
-    }
-    .hero h1 { font-size:clamp(1.6rem,6vw,3.2rem); font-weight:900; line-height:1.25; margin-bottom:.75rem; }
-    .hero h1 .highlight {
-        background:linear-gradient(135deg,var(--accent),var(--gold));
-        -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .hero p { color:var(--text-muted); font-size:.92rem; max-width:400px; margin:0 auto 1.5rem; line-height:1.5; }
+    /* HERO */
+    .hero { position:relative; padding:5rem 2rem 3rem; text-align:center; overflow:hidden; }
+    .hero::before { content:''; position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:800px; height:800px; background:radial-gradient(ellipse,rgba(240,165,0,.08) 0%,transparent 70%); pointer-events:none; }
+    .hero-badge { display:inline-block; background:rgba(240,165,0,.1); border:1px solid rgba(240,165,0,.3); color:var(--accent); padding:6px 18px; border-radius:30px; font-size:.85rem; font-weight:700; margin-bottom:1.5rem; }
+    .hero h1 { font-size:clamp(2.2rem,5vw,3.8rem); font-weight:900; line-height:1.2; margin-bottom:1rem; }
+    .hero h1 .highlight { background:linear-gradient(135deg,var(--accent),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero p { color:var(--text-muted); font-size:1.1rem; max-width:500px; margin:0 auto 2.5rem; }
+    .stats-bar { display:flex; justify-content:center; gap:2rem; flex-wrap:wrap; margin-bottom:3rem; }
+    .stat-item { text-align:center; padding:1rem 1.5rem; background:var(--surface); border:1px solid var(--border); border-radius:14px; min-width:100px; }
+    .stat-num { font-size:1.8rem; font-weight:900; color:var(--accent); }
+    .stat-label { font-size:.8rem; color:var(--text-muted); }
 
-    /* Stats — 2x2 on mobile, row on desktop */
-    .stats-bar {
-        display:grid; grid-template-columns:1fr 1fr; gap:.7rem;
-        margin-bottom:2rem; max-width:360px; margin-left:auto; margin-right:auto;
-    }
-    .stat-item {
-        text-align:center; padding:.8rem .5rem; background:var(--surface);
-        border:1px solid var(--border); border-radius:12px;
-    }
-    .stat-num { font-size:1.5rem; font-weight:900; color:var(--accent); line-height:1; }
-    .stat-label { font-size:.72rem; color:var(--text-muted); margin-top:2px; }
-
-    /* ══ FILTER ══ */
-    .filter-section {
-        background:var(--surface); border-bottom:1px solid var(--border);
-        padding:.9rem 1rem; position:sticky; top:var(--nav-h); z-index:50;
-        overflow-x:auto; -webkit-overflow-scrolling:touch;
-    }
-    /* hide scrollbar but keep scroll */
-    .filter-section::-webkit-scrollbar { display:none; }
-    .filter-section { scrollbar-width:none; }
-
-    .filter-inner { display:flex; align-items:center; gap:.7rem; min-width:max-content; }
-    .filter-label { font-weight:700; color:var(--text-muted); font-size:.82rem; white-space:nowrap; }
-    .filter-pills { display:flex; gap:6px; flex-shrink:0; }
-    .pill {
-        padding:7px 13px; border-radius:30px; border:1px solid var(--border);
-        background:transparent; color:var(--text-muted); cursor:pointer;
-        font-family:'Cairo',sans-serif; font-weight:600; font-size:.82rem;
-        text-decoration:none; transition:all .2s; white-space:nowrap;
-        min-height:36px; display:flex; align-items:center;
-    }
+    /* FILTER */
+    .filter-section { background:var(--surface); border-bottom:1px solid var(--border); padding:1.2rem 2rem; position:sticky; top:70px; z-index:50; }
+    .filter-inner { max-width:1300px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .filter-label { font-weight:700; color:var(--text-muted); font-size:.9rem; white-space:nowrap; }
+    .filter-pills { display:flex; gap:8px; flex-wrap:wrap; }
+    .pill { padding:7px 16px; border-radius:30px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; font-family:'Cairo',sans-serif; font-weight:600; font-size:.85rem; text-decoration:none; transition:all .2s; }
     .pill:hover { border-color:var(--accent); color:var(--accent); }
     .pill.active { background:var(--accent); border-color:var(--accent); color:#000; font-weight:700; }
     .pill-new.active { background:var(--new-color); border-color:var(--new-color); }
     .pill-like.active { background:var(--like-new-color); border-color:var(--like-new-color); }
     .pill-used.active { background:var(--used-color); border-color:var(--used-color); }
-    .divider-pill { width:1px; height:20px; background:var(--border); align-self:center; flex-shrink:0; }
+    .divider-pill { width:1px; height:24px; background:var(--border); align-self:center; }
 
-    /* ══ CONTENT ══ */
-    .content { padding:1.2rem 1rem; }
-    .condition-block { margin-bottom:2.5rem; }
-    .condition-header {
-        display:flex; align-items:center; gap:10px; margin-bottom:1.2rem;
-        padding-bottom:.8rem; border-bottom:1px solid var(--border); flex-wrap:wrap;
-    }
-    .condition-badge { padding:6px 14px; border-radius:30px; font-weight:800; font-size:.85rem; }
+    /* CONTENT */
+    .content { max-width:1300px; margin:0 auto; padding:2rem; }
+    .condition-block { margin-bottom:4rem; }
+    .condition-header { display:flex; align-items:center; gap:16px; margin-bottom:2rem; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+    .condition-badge { padding:8px 20px; border-radius:30px; font-weight:800; font-size:1rem; }
     .badge-new { background:rgba(0,200,150,.15); color:var(--new-color); border:1px solid rgba(0,200,150,.3); }
     .badge-like_new { background:rgba(77,171,247,.15); color:var(--like-new-color); border:1px solid rgba(77,171,247,.3); }
     .badge-used { background:rgba(255,140,66,.15); color:var(--used-color); border:1px solid rgba(255,140,66,.3); }
-    .condition-title { font-size:1.2rem; font-weight:900; }
-    .condition-count { color:var(--text-muted); font-size:.85rem; margin-right:auto; }
+    .condition-title { font-size:1.5rem; font-weight:900; }
+    .condition-count { margin-right:auto; color:var(--text-muted); font-size:.9rem; }
+    .brand-section { margin-bottom:2.5rem; }
+    .brand-header { display:flex; align-items:center; gap:12px; margin-bottom:1.2rem; }
+    .brand-name { font-size:1.1rem; font-weight:800; }
+    .brand-logo { width:36px; height:36px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .brand-count { background:var(--surface2); color:var(--text-muted); padding:3px 10px; border-radius:20px; font-size:.78rem; font-weight:700; }
 
-    .brand-section { margin-bottom:2rem; }
-    .brand-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
-    .brand-name { font-size:1rem; font-weight:800; }
-    .brand-logo {
-        width:32px; height:32px; background:var(--surface2); border:1px solid var(--border);
-        border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
-    }
-    .brand-count {
-        background:var(--surface2); color:var(--text-muted); padding:2px 8px;
-        border-radius:20px; font-size:.72rem; font-weight:700;
-    }
+    /* GRID */
+    .mobiles-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:1.2rem; }
 
-    /* ══ GRID: 2 columns on mobile ══ */
-    .mobiles-grid {
-        display:grid;
-        grid-template-columns:repeat(2, 1fr);
-        gap:.8rem;
-    }
-
-    /* ══ CARD ══ */
-    .mobile-card {
-        background:var(--surface); border:1px solid var(--border); border-radius:14px;
-        overflow:hidden; display:flex; flex-direction:column; position:relative;
-        transition:transform .2s ease, border-color .2s;
-        /* Prevent tap-flash */
-        -webkit-tap-highlight-color:transparent;
-    }
-    .mobile-card:active { transform:scale(0.98); }
-    .card-condition-strip {
-        position:absolute; top:8px; right:8px; padding:3px 8px;
-        border-radius:20px; font-size:.65rem; font-weight:800; z-index:2; line-height:1.3;
-    }
+    /* CARD */
+    .mobile-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden; transition:all .3s cubic-bezier(.34,1.56,.64,1); position:relative; display:flex; flex-direction:column; cursor:pointer; }
+    .mobile-card:hover { transform:translateY(-6px) scale(1.01); border-color:rgba(240,165,0,.4); box-shadow:0 20px 40px rgba(0,0,0,.4); }
+    .card-condition-strip { position:absolute; top:12px; right:12px; padding:4px 10px; border-radius:20px; font-size:.72rem; font-weight:800; z-index:2; }
     .strip-new { background:var(--new-color); color:#000; }
     .strip-like_new { background:var(--like-new-color); color:#000; }
     .strip-used { background:var(--used-color); color:#000; }
 
-    .card-img-wrap {
-        width:100%; aspect-ratio:4/3; background:var(--surface2);
-        display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
-    }
-    .card-img-wrap::after {
-        content:''; position:absolute; bottom:0; left:0; right:0; height:40px;
-        background:linear-gradient(transparent,var(--surface));
-    }
-    .card-img-wrap img { width:100%; height:100%; object-fit:cover; }
-    .card-img-placeholder { font-size:40px; opacity:.25; }
+    /* SLIDESHOW */
+    .card-img-wrap { width:100%; height:200px; background:var(--surface2); position:relative; overflow:hidden; }
+    .slide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .6s ease; }
+    .slide-img.active { opacity:1; }
+    .slide-dots { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:3; }
+    .slide-dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.4); transition:background .3s; }
+    .slide-dot.active { background:#fff; }
+    .card-img-placeholder { font-size:60px; opacity:.3; display:flex; align-items:center; justify-content:center; height:100%; }
+    .img-count-badge { position:absolute; top:10px; left:10px; background:rgba(0,0,0,.6); color:#fff; font-size:.68rem; font-weight:700; padding:3px 8px; border-radius:10px; z-index:3; }
 
-    .card-body { padding:10px; flex:1; display:flex; flex-direction:column; }
-    .card-brand { font-size:.68rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
-    .card-name { font-size:.82rem; font-weight:800; margin-bottom:6px; line-height:1.3; }
-    .card-specs { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:7px; }
-    .spec-tag {
-        background:var(--surface2); border:1px solid var(--border);
-        padding:2px 6px; border-radius:5px; font-size:.62rem; color:var(--text-muted); font-weight:600;
-    }
-    .card-desc { font-size:.72rem; color:var(--text-muted); margin-bottom:8px; line-height:1.4; flex:1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-    .card-footer-row {
-        display:flex; align-items:center; justify-content:space-between;
-        border-top:1px solid var(--border); padding-top:8px; margin-bottom:8px;
-    }
-    .card-price { font-size:.95rem; font-weight:900; color:var(--accent); }
-    .card-price span { font-size:.65rem; color:var(--text-muted); font-weight:400; }
-
-    /* ══ ACTION BUTTONS (stacked on mobile) ══ */
-    .card-actions { display:flex; flex-direction:column; gap:6px; }
-    .card-actions a {
-        width:100%; display:flex; align-items:center; justify-content:center; gap:5px;
-        padding:9px 6px; border-radius:9px; font-family:'Cairo',sans-serif; font-weight:700;
-        font-size:.78rem; text-decoration:none; transition:background .15s; border:none; cursor:pointer;
-        min-height:38px;
-    }
+    .card-body { padding:14px; flex:1; display:flex; flex-direction:column; }
+    .card-brand { font-size:.75rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+    .card-name { font-size:.95rem; font-weight:800; margin-bottom:8px; line-height:1.3; }
+    .card-specs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .spec-tag { background:var(--surface2); border:1px solid var(--border); padding:3px 8px; border-radius:6px; font-size:.72rem; color:var(--text-muted); font-weight:600; }
+    .card-desc { font-size:.78rem; color:var(--text-muted); margin-bottom:10px; line-height:1.4; flex:1; }
+    .card-footer-row { display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border); padding-top:10px; margin-top:auto; margin-bottom:10px; }
+    .card-price { font-size:1.1rem; font-weight:900; color:var(--accent); }
+    .card-price span { font-size:.7rem; color:var(--text-muted); font-weight:400; }
+    .card-actions { display:flex; gap:8px; }
+    .card-actions a { flex:1; display:flex; align-items:center; justify-content:center; gap:5px; padding:9px 6px; border-radius:10px; font-family:'Cairo',sans-serif; font-weight:700; font-size:.82rem; text-decoration:none; transition:all .2s; border:none; cursor:pointer; }
     .btn-wa { background:rgba(37,211,102,.12); color:var(--wa); border:1px solid rgba(37,211,102,.3); }
-    .btn-wa:active { background:rgba(37,211,102,.3); }
+    .btn-wa:hover { background:rgba(37,211,102,.25); transform:translateY(-2px); }
     .btn-yt { background:rgba(255,0,0,.1); color:var(--yt); border:1px solid rgba(255,0,0,.25); }
-    .btn-yt:active { background:rgba(255,0,0,.22); }
+    .btn-yt:hover { background:rgba(255,0,0,.22); transform:translateY(-2px); }
     .btn-yt.disabled { opacity:.35; pointer-events:none; }
+    .btn-details { background:rgba(240,165,0,.1); color:var(--accent); border:1px solid rgba(240,165,0,.3); }
+    .btn-details:hover { background:rgba(240,165,0,.2); transform:translateY(-2px); }
 
-    /* ══ EMPTY ══ */
-    .empty-state { text-align:center; padding:4rem 1.5rem; color:var(--text-muted); }
-    .empty-state .icon { font-size:3.5rem; margin-bottom:1rem; opacity:.3; }
+    .empty-state { text-align:center; padding:5rem 2rem; color:var(--text-muted); }
+    .empty-state .icon { font-size:4rem; margin-bottom:1rem; opacity:.3; }
 
-    /* ══ DESKTOP OVERRIDES ══ */
-    @media (min-width: 480px) {
-        .mobiles-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-        .card-actions { flex-direction:row; }
-        .card-actions a { flex:1; }
+    /* ══════════════════════════════════════
+       MODAL
+    ══════════════════════════════════════ */
+    .modal-overlay {
+        display:none; position:fixed; inset:0; z-index:1000;
+        background:rgba(0,0,0,.8); backdrop-filter:blur(6px);
+        align-items:center; justify-content:center; padding:1rem;
     }
-    @media (min-width: 768px) {
-        .hero { padding: 4rem 2rem 2.5rem; }
-        .hero p { font-size:1rem; }
-        .stats-bar { grid-template-columns: repeat(4,1fr); max-width:600px; }
-        .filter-section { padding:1rem 2rem; overflow-x:visible; }
-        .filter-inner { min-width:unset; flex-wrap:wrap; }
-        .content { padding:2rem; max-width:1300px; margin:0 auto; }
-        .mobiles-grid { grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:1.2rem; }
-        .card-img-wrap { aspect-ratio:unset; height:180px; }
-        .mobile-card:hover { transform:translateY(-5px) scale(1.01); border-color:rgba(240,165,0,.4); box-shadow:0 16px 36px rgba(0,0,0,.4); }
-        .card-body { padding:14px; }
-        .card-name { font-size:.92rem; }
-        .card-price { font-size:1.05rem; }
+    .modal-overlay.open { display:flex; animation:fadeIn .2s ease; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    .modal-box {
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:24px;
+        width:100%; max-width:860px;
+        max-height:90vh;
+        overflow-y:auto;
+        position:relative;
+        animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);
     }
-    @media (min-width: 1024px) {
-        .mobiles-grid { grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); }
+    @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+    .modal-close {
+        position:absolute; top:16px; left:16px;
+        width:36px; height:36px;
+        background:var(--surface2); border:1px solid var(--border);
+        border-radius:50%; cursor:pointer; font-size:18px;
+        display:flex; align-items:center; justify-content:center;
+        transition:all .2s; z-index:10; color:var(--text);
     }
+    .modal-close:hover { background:rgba(220,50,50,.2); border-color:rgba(220,50,50,.4); color:#ff6b6b; transform:scale(1.1); }
+
+    /* Gallery inside modal */
+    .modal-gallery { position:relative; height:320px; background:var(--surface2); border-radius:20px 20px 0 0; overflow:hidden; }
+    .modal-gallery .slide-img { border-radius:0; }
+    .gallery-arrow {
+        position:absolute; top:50%; transform:translateY(-50%);
+        width:38px; height:38px;
+        background:rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.2);
+        border-radius:50%; cursor:pointer; font-size:18px;
+        display:flex; align-items:center; justify-content:center;
+        color:#fff; z-index:5; transition:all .2s;
+    }
+    .gallery-arrow:hover { background:rgba(240,165,0,.8); }
+    .gallery-prev { right:12px; }
+    .gallery-next { left:12px; }
+    .gallery-dots { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:5; }
+    .gallery-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.4); cursor:pointer; transition:all .3s; }
+    .gallery-dot.active { background:#fff; transform:scale(1.3); }
+    .gallery-counter { position:absolute; bottom:12px; right:14px; background:rgba(0,0,0,.6); color:#fff; font-size:.75rem; padding:3px 10px; border-radius:10px; }
+
+    .modal-body { padding:2rem; }
+    .modal-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:1.5rem; }
+    .modal-brand { font-size:.8rem; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+    .modal-name { font-size:1.6rem; font-weight:900; line-height:1.2; }
+    .modal-condition { padding:6px 16px; border-radius:20px; font-weight:800; font-size:.85rem; align-self:flex-start; margin-top:4px; }
+    .modal-price { font-size:2rem; font-weight:900; color:var(--accent); margin-bottom:1.5rem; }
+    .modal-price span { font-size:1rem; color:var(--text-muted); font-weight:400; }
+    .modal-specs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:1.5rem; }
+    .modal-spec { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center; }
+    .modal-spec-icon { font-size:1.2rem; margin-bottom:4px; }
+    .modal-spec-val { font-weight:800; font-size:.95rem; }
+    .modal-spec-lbl { font-size:.72rem; color:var(--text-muted); margin-top:2px; }
+    .modal-desc { background:var(--surface2); border-radius:14px; padding:1rem 1.2rem; color:var(--text-muted); font-size:.9rem; line-height:1.7; margin-bottom:1.5rem; }
+    .modal-desc-title { font-weight:800; color:var(--text); margin-bottom:.5rem; font-size:.9rem; }
+    .modal-actions { display:flex; gap:12px; }
+    .modal-actions a { flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:14px; border-radius:14px; font-family:'Cairo',sans-serif; font-weight:800; font-size:.95rem; text-decoration:none; transition:all .2s; }
+    .modal-btn-wa { background:rgba(37,211,102,.15); color:var(--wa); border:1px solid rgba(37,211,102,.4); }
+    .modal-btn-wa:hover { background:rgba(37,211,102,.3); transform:translateY(-2px); }
+    .modal-btn-yt { background:rgba(255,0,0,.12); color:var(--yt); border:1px solid rgba(255,0,0,.3); }
+    .modal-btn-yt:hover { background:rgba(255,0,0,.25); transform:translateY(-2px); }
+    .modal-btn-yt.disabled { opacity:.35; pointer-events:none; }
 </style>
 {% endblock %}
 
@@ -188,7 +169,7 @@
 <div class="hero">
     <div class="hero-badge">🌿 أهلاً بك في الروضة</div>
     <h1>تسوّق أحدث الموبايلات<br><span class="highlight">بأفضل الأسعار</span></h1>
-    <p>جديد، شبه جديد، أو مستعمل — عندنا كل اللي تحتاجه</p>
+    <p>جديد، شبه جديد، أو مستعمل — عندنا كل اللي تحتاجه بضمان الجودة</p>
     <div class="stats-bar">
         {% set total = namespace(n=0,new=0,like=0,used=0) %}
         {% for cond,brands in grouped.items() %}{% for brand,items in brands.items() %}
@@ -206,7 +187,7 @@
 
 <div class="filter-section">
     <div class="filter-inner">
-        <span class="filter-label">🔍</span>
+        <span class="filter-label">🔍 الحالة:</span>
         <div class="filter-pills">
             <a href="/?condition=all&brand={{ brand_filter }}" class="pill {% if condition_filter=='all' %}active{% endif %}">الكل</a>
             <a href="/?condition=new&brand={{ brand_filter }}" class="pill pill-new {% if condition_filter=='new' %}active{% endif %}">✨ جديد</a>
@@ -214,7 +195,7 @@
             <a href="/?condition=used&brand={{ brand_filter }}" class="pill pill-used {% if condition_filter=='used' %}active{% endif %}">🔄 مستعمل</a>
         </div>
         {% if brands %}<div class="divider-pill"></div>
-        <span class="filter-label">📱</span>
+        <span class="filter-label">📱 الماركة:</span>
         <div class="filter-pills">
             <a href="/?condition={{ condition_filter }}&brand=all" class="pill {% if brand_filter=='all' %}active{% endif %}">الكل</a>
             {% for b in brands %}<a href="/?condition={{ condition_filter }}&brand={{ b }}" class="pill {% if brand_filter==b %}active{% endif %}">{{ b }}</a>{% endfor %}
@@ -249,16 +230,32 @@
                 </div>
                 <div class="mobiles-grid">
                 {% for m in items %}
+                {% set imgs = [] %}
+                {% if m.images_json %}{% set imgs = m.images_json | fromjson %}{% elif m.image_url %}{% set imgs = [m.image_url] %}{% endif %}
                 {% set wa_msg = "مرحباً،%20أنا%20مهتم%20بـ%20" + m.name|urlencode + "%20--%20السعر:%20" + m.price|string + "%20جنيه%20--%20الحالة:%20" + m.condition %}
-                <div class="mobile-card">
+
+                <div class="mobile-card" onclick="openModal({{ m.id }})">
                     <div class="card-condition-strip strip-{{ m.condition }}">
                         {% if m.condition=='new' %}جديد{% elif m.condition=='like_new' %}شبه جديد{% else %}مستعمل{% endif %}
                     </div>
-                    <div class="card-img-wrap">
-                        {% if m.image_url %}
-                        <img src="{{ m.image_url }}" alt="{{ m.name }}" loading="lazy"
-                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                        <div class="card-img-placeholder" style="display:none">📱</div>
+                    <div class="card-img-wrap" id="card-imgs-{{ m.id }}">
+                        {% if imgs %}
+                            {% if imgs|length > 1 %}
+                            <span class="img-count-badge">{{ imgs|length }} 📷</span>
+                            {% endif %}
+                            {% for img in imgs %}
+                            <img class="slide-img {% if loop.first %}active{% endif %}"
+                                 src="{{ img }}" alt="{{ m.name }}" loading="lazy"
+                                 data-index="{{ loop.index0 }}"
+                                 onerror="this.style.display='none'">
+                            {% endfor %}
+                            {% if imgs|length > 1 %}
+                            <div class="slide-dots">
+                                {% for img in imgs %}
+                                <div class="slide-dot {% if loop.first %}active{% endif %}"></div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         {% else %}
                         <div class="card-img-placeholder">📱</div>
                         {% endif %}
@@ -267,24 +264,26 @@
                         <div class="card-brand">{{ m.brand }}</div>
                         <div class="card-name">{{ m.name }}</div>
                         <div class="card-specs">
-                            {% if m.storage %}<span class="spec-tag">{{ m.storage }}</span>{% endif %}
-                            {% if m.ram %}<span class="spec-tag">{{ m.ram }}</span>{% endif %}
-                            {% if m.color %}<span class="spec-tag">{{ m.color }}</span>{% endif %}
+                            {% if m.storage %}<span class="spec-tag">💾 {{ m.storage }}</span>{% endif %}
+                            {% if m.ram %}<span class="spec-tag">⚡ {{ m.ram }}</span>{% endif %}
+                            {% if m.color %}<span class="spec-tag">🎨 {{ m.color }}</span>{% endif %}
                         </div>
-                        {% if m.description %}<div class="card-desc">{{ m.description }}</div>{% endif %}
+                        {% if m.description %}<div class="card-desc">{{ m.description[:70] }}{% if m.description|length > 70 %}...{% endif %}</div>{% endif %}
                         <div class="card-footer-row">
                             <div class="card-price">{{ "{:,.0f}".format(m.price) }} <span>جنيه</span></div>
                         </div>
-                        <div class="card-actions">
+                        <div class="card-actions" onclick="event.stopPropagation()">
                             <a class="btn-wa" href="https://wa.me/{{ whatsapp_num }}?text={{ wa_msg }}" target="_blank" rel="noopener">
-                               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.054 23.61a.75.75 0 0 0 .916.919l5.79-1.484A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.68-.497-5.22-1.364l-.374-.217-3.88.994.994-3.842-.233-.384A9.962 9.962 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                               واتساب
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.054 23.61a.75.75 0 0 0 .916.919l5.79-1.484A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.68-.497-5.22-1.364l-.374-.217-3.88.994.994-3.842-.233-.384A9.962 9.962 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                                واتساب
                             </a>
                             <a class="btn-yt {% if not m.youtube_url %}disabled{% endif %}"
-                               href="{{ m.youtube_url or '#' }}"
-                               {% if m.youtube_url %}target="_blank" rel="noopener"{% endif %}>
-                               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                               {% if m.youtube_url %}مراجعة{% else %}قريباً{% endif %}
+                               href="{{ m.youtube_url or '#' }}" {% if m.youtube_url %}target="_blank" rel="noopener"{% endif %}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                {% if m.youtube_url %}يوتيوب{% else %}قريباً{% endif %}
+                            </a>
+                            <a class="btn-details" onclick="event.stopPropagation();openModal({{ m.id }})">
+                                🔍 تفاصيل
                             </a>
                         </div>
                     </div>
@@ -300,4 +299,171 @@
     <div class="empty-state"><div class="icon">📱</div><p>لا توجد موبايلات متاحة حالياً</p></div>
 {% endif %}
 </div>
+
+<!-- ══════════════════════════════ MODAL ══════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal-box" id="modalBox">
+        <button class="modal-close" onclick="closeModalBtn()">✕</button>
+        <div class="modal-gallery" id="modalGallery">
+            <div class="card-img-placeholder" style="height:100%;font-size:4rem">📱</div>
+        </div>
+        <div class="modal-body">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-brand" id="mBrand"></div>
+                    <div class="modal-name" id="mName"></div>
+                    <div class="modal-condition" id="mCond"></div>
+                </div>
+            </div>
+            <div class="modal-price" id="mPrice"></div>
+            <div class="modal-specs-grid" id="mSpecs"></div>
+            <div class="modal-desc" id="mDescWrap" style="display:none">
+                <div class="modal-desc-title">📝 الوصف</div>
+                <div id="mDesc"></div>
+            </div>
+            <div class="modal-actions" id="mActions"></div>
+        </div>
+    </div>
+</div>
+
+<!-- بيانات الموبايلات في JSON للـ JS -->
+<script>
+const MOBILES_DATA = {
+    {% for m in mobiles %}
+    {{ m.id }}: {
+        id: {{ m.id }},
+        name: {{ m.name | tojson }},
+        brand: {{ m.brand | tojson }},
+        condition: {{ m.condition | tojson }},
+        price: {{ m.price }},
+        storage: {{ (m.storage or '') | tojson }},
+        ram: {{ (m.ram or '') | tojson }},
+        color: {{ (m.color or '') | tojson }},
+        description: {{ (m.description or '') | tojson }},
+        images: {{ (m.images_json or '[]') | fromjson | tojson }},
+        image_url: {{ (m.image_url or '') | tojson }},
+        youtube_url: {{ (m.youtube_url or '') | tojson }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+};
+const WA_NUM = "{{ whatsapp_num }}";
+const COND_LABELS = { new:'✨ جديد', like_new:'💎 شبه جديد', used:'🔄 مستعمل' };
+const COND_COLORS = { new:'var(--new-color)', like_new:'var(--like-new-color)', used:'var(--used-color)' };
+
+/* ── Slideshow on cards ── */
+const slideshows = {};
+
+function initSlideshows() {
+    document.querySelectorAll('.card-img-wrap').forEach(wrap => {
+        const slides = wrap.querySelectorAll('.slide-img');
+        const dots   = wrap.querySelectorAll('.slide-dot');
+        if (slides.length <= 1) return;
+
+        const id = wrap.id;
+        let cur = 0;
+        slideshows[id] = setInterval(() => {
+            slides[cur].classList.remove('active');
+            dots[cur]?.classList.remove('active');
+            cur = (cur + 1) % slides.length;
+            slides[cur].classList.add('active');
+            dots[cur]?.classList.add('active');
+        }, 2000);
+    });
+}
+initSlideshows();
+
+/* ── Modal logic ── */
+let modalGalIdx = 0;
+let modalGalImgs = [];
+
+function openModal(id) {
+    const m = MOBILES_DATA[id];
+    if (!m) return;
+
+    // images
+    modalGalImgs = m.images.length ? m.images : (m.image_url ? [m.image_url] : []);
+    modalGalIdx  = 0;
+    renderGallery();
+
+    // info
+    document.getElementById('mBrand').textContent = m.brand;
+    document.getElementById('mName').textContent  = m.name;
+    const condEl = document.getElementById('mCond');
+    condEl.textContent = COND_LABELS[m.condition] || m.condition;
+    condEl.style.cssText = `background:${COND_COLORS[m.condition]}22;color:${COND_COLORS[m.condition]};border:1px solid ${COND_COLORS[m.condition]}44`;
+
+    document.getElementById('mPrice').innerHTML =
+        `${new Intl.NumberFormat('ar-EG').format(m.price)} <span>جنيه</span>`;
+
+    // specs
+    const specs = [];
+    if (m.storage) specs.push({icon:'💾',val:m.storage,lbl:'التخزين'});
+    if (m.ram)     specs.push({icon:'⚡',val:m.ram,lbl:'الرام'});
+    if (m.color)   specs.push({icon:'🎨',val:m.color,lbl:'اللون'});
+    document.getElementById('mSpecs').innerHTML = specs.map(s =>
+        `<div class="modal-spec"><div class="modal-spec-icon">${s.icon}</div><div class="modal-spec-val">${s.val}</div><div class="modal-spec-lbl">${s.lbl}</div></div>`
+    ).join('');
+
+    // description
+    if (m.description) {
+        document.getElementById('mDesc').textContent = m.description;
+        document.getElementById('mDescWrap').style.display = '';
+    } else {
+        document.getElementById('mDescWrap').style.display = 'none';
+    }
+
+    // actions
+    const waMsg = encodeURIComponent(`مرحباً، أنا مهتم بـ ${m.name} -- السعر: ${m.price} جنيه -- الحالة: ${m.condition}`);
+    document.getElementById('mActions').innerHTML = `
+        <a class="modal-btn-wa" href="https://wa.me/${WA_NUM}?text=${waMsg}" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.862L.054 23.61a.75.75 0 0 0 .916.919l5.79-1.484A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.9 0-3.68-.497-5.22-1.364l-.374-.217-3.88.994.994-3.842-.233-.384A9.962 9.962 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            تواصل على واتساب
+        </a>
+        ${m.youtube_url
+            ? `<a class="modal-btn-yt" href="${m.youtube_url}" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                شاهد المراجعة
+               </a>`
+            : ''
+        }
+    `;
+
+    document.getElementById('modalOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function renderGallery() {
+    const g = document.getElementById('modalGallery');
+    if (!modalGalImgs.length) {
+        g.innerHTML = '<div class="card-img-placeholder" style="height:100%;font-size:4rem">📱</div>';
+        return;
+    }
+    g.innerHTML = `
+        ${modalGalImgs.map((src,i) =>
+            `<img class="slide-img ${i===modalGalIdx?'active':''}" src="${src}" alt="" style="border-radius:0">`
+        ).join('')}
+        ${modalGalImgs.length > 1 ? `
+        <button class="gallery-arrow gallery-prev" onclick="galNav(-1)">‹</button>
+        <button class="gallery-arrow gallery-next" onclick="galNav(1)">›</button>
+        <div class="gallery-dots">
+            ${modalGalImgs.map((_,i) => `<div class="gallery-dot ${i===modalGalIdx?'active':''}" onclick="galGo(${i})"></div>`).join('')}
+        </div>
+        <div class="gallery-counter">${modalGalIdx+1} / ${modalGalImgs.length}</div>
+        ` : ''}
+    `;
+}
+
+function galNav(dir) {
+    modalGalIdx = (modalGalIdx + dir + modalGalImgs.length) % modalGalImgs.length;
+    renderGallery();
+}
+function galGo(i) { modalGalIdx = i; renderGallery(); }
+
+function closeModal(e) { if(e.target === document.getElementById('modalOverlay')) closeModalBtn(); }
+function closeModalBtn() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModalBtn(); if(e.key==='ArrowLeft') galNav(1); if(e.key==='ArrowRight') galNav(-1); });
+</script>
 {% endblock %}

@@ -1,16 +1,37 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
-import sqlite3, os, urllib.parse
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, send_from_directory
+import sqlite3, os, urllib.parse, uuid, json
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'rawda-secret-2024')
 
-ADMIN_TOKEN   = os.environ.get('ADMIN_TOKEN', 'rawda2024xK9')
-# ✏️ غيّر الرقم ده لرقمك — بدون + وبدون مسافات
-WHATSAPP_NUM  = os.environ.get('WHATSAPP_NUM', '201000000000')
+ADMIN_TOKEN   = os.environ.get('ADMIN_TOKEN', '1912003')
+WHATSAPP_NUM  = os.environ.get('WHATSAPP_NUM', '201094918310')
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'rawda.db')
+DB_PATH       = os.path.join(os.path.dirname(__file__), 'rawda.db')
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+ALLOWED_EXTS  = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
-# ─── DB ──────────────────────────────────────────────────────
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024  # 40MB
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
+
+def save_uploaded_images(files):
+    saved = []
+    for f in files:
+        if f and f.filename and allowed_file(f.filename):
+            ext = f.filename.rsplit('.', 1)[1].lower()
+            fname = f"{uuid.uuid4().hex}.{ext}"
+            f.save(os.path.join(UPLOAD_FOLDER, fname))
+            saved.append(f"/uploads/{fname}")
+    return saved
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
@@ -23,7 +44,6 @@ def check_token(token):
 
 def init_db():
     conn = get_db()
-    # جدول الموبايلات — مع youtube_url
     conn.execute('''
         CREATE TABLE IF NOT EXISTS mobiles (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,17 +56,17 @@ def init_db():
             color       TEXT,
             description TEXT,
             image_url   TEXT,
+            images_json TEXT,
             youtube_url TEXT,
             created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
-    # أضف العمود لو الجدول موجود بدون youtube_url (migration بسيطة)
-    try:
-        conn.execute('ALTER TABLE mobiles ADD COLUMN youtube_url TEXT')
-    except Exception:
-        pass
+    for col_def in ['youtube_url TEXT', 'images_json TEXT']:
+        try:
+            conn.execute(f'ALTER TABLE mobiles ADD COLUMN {col_def}')
+        except Exception:
+            pass
 
-    # جدول المبيعات (History)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS sales (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,27 +83,19 @@ def init_db():
     count = conn.execute('SELECT COUNT(*) FROM mobiles').fetchone()[0]
     if count == 0:
         samples = [
-            ('Samsung Galaxy S24 Ultra','Samsung','new',4999,'256GB','12GB','أسود','هاتف رائد بكاميرا 200 ميجابكسل وقلم S Pen','https://via.placeholder.com/300x400/1a1a2e/ffffff?text=S24+Ultra',''),
-            ('Samsung Galaxy A55','Samsung','new',1899,'128GB','8GB','أزرق','هاتف متوسط الفئة بتصميم أنيق','https://via.placeholder.com/300x400/16213e/ffffff?text=Galaxy+A55',''),
-            ('iPhone 15 Pro Max','Apple','new',6499,'256GB','8GB','تيتانيوم','أقوى هاتف من آبل بشريحة A17 Pro','https://via.placeholder.com/300x400/0f3460/ffffff?text=iPhone+15+Pro',''),
-            ('iPhone 14','Apple','like_new',3200,'128GB','6GB','أبيض','حالة ممتازة بدون خدوش','https://via.placeholder.com/300x400/533483/ffffff?text=iPhone+14',''),
-            ('Realme GT 6','Realme','new',2199,'256GB','12GB','أخضر','معالج Snapdragon 8s Gen 3 بسعر منافس','https://via.placeholder.com/300x400/e94560/ffffff?text=Realme+GT6',''),
-            ('Xiaomi 14','Xiaomi','new',3499,'512GB','16GB','أبيض','كاميرا Leica وشحن 90 واط','https://via.placeholder.com/300x400/1a1a2e/ffffff?text=Xiaomi+14',''),
-            ('Samsung Galaxy S23','Samsung','like_new',2800,'256GB','8GB','كريمي','مستعمل استخدام خفيف جداً','https://via.placeholder.com/300x400/16213e/ffffff?text=Galaxy+S23',''),
-            ('Oppo Reno 12','Oppo','new',1799,'128GB','8GB','أخضر','تصوير ليلي رائع وشحن سريع 80W','https://via.placeholder.com/300x400/0f3460/ffffff?text=Oppo+Reno12',''),
-            ('iPhone 12','Apple','used',1600,'64GB','4GB','أسود','مستعمل بحالة جيدة، البطارية 85%','https://via.placeholder.com/300x400/533483/ffffff?text=iPhone+12',''),
-            ('Realme C67','Realme','new',699,'128GB','6GB','أزرق','هاتف اقتصادي بأداء ممتاز','https://via.placeholder.com/300x400/e94560/ffffff?text=Realme+C67',''),
-            ('Xiaomi Redmi Note 13','Xiaomi','new',899,'128GB','8GB','أسود','شاشة AMOLED وبطارية 5000 mAh','https://via.placeholder.com/300x400/1a1a2e/ffffff?text=Redmi+Note13',''),
-            ('Samsung Galaxy A15','Samsung','used',550,'128GB','4GB','أزرق','مستعمل سنة، حالة كويسة','https://via.placeholder.com/300x400/16213e/ffffff?text=Galaxy+A15',''),
+            ('Samsung Galaxy S24 Ultra','Samsung','new',4999,'256GB','12GB','أسود','هاتف رائد بكاميرا 200 ميجابكسل وقلم S Pen','https://via.placeholder.com/400x500/1a1a2e/ffffff?text=S24+Ultra','[]',''),
+            ('iPhone 15 Pro Max','Apple','new',6499,'256GB','8GB','تيتانيوم','أقوى هاتف من آبل بشريحة A17 Pro','https://via.placeholder.com/400x500/0f3460/ffffff?text=iPhone+15+Pro','[]',''),
+            ('Realme GT 6','Realme','new',2199,'256GB','12GB','أخضر','معالج Snapdragon 8s Gen 3 بسعر منافس','https://via.placeholder.com/400x500/e94560/ffffff?text=Realme+GT6','[]',''),
+            ('iPhone 14','Apple','like_new',3200,'128GB','6GB','أبيض','حالة ممتازة بدون خدوش','https://via.placeholder.com/400x500/533483/ffffff?text=iPhone+14','[]',''),
+            ('Samsung Galaxy S23','Samsung','like_new',2800,'256GB','8GB','كريمي','مستعمل استخدام خفيف جداً','https://via.placeholder.com/400x500/16213e/ffffff?text=Galaxy+S23','[]',''),
+            ('iPhone 12','Apple','used',1600,'64GB','4GB','أسود','مستعمل بحالة جيدة، البطارية 85%','https://via.placeholder.com/400x500/533483/ffffff?text=iPhone+12','[]',''),
         ]
         conn.executemany(
-            'INSERT INTO mobiles (name,brand,condition,price,storage,ram,color,description,image_url,youtube_url) VALUES (?,?,?,?,?,?,?,?,?,?)',
+            'INSERT INTO mobiles (name,brand,condition,price,storage,ram,color,description,image_url,images_json,youtube_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
             samples
         )
     conn.commit()
     conn.close()
-
-# ─── PUBLIC ──────────────────────────────────────────────────
 
 @app.route('/')
 def index():
@@ -107,8 +119,6 @@ def index():
                            condition_filter=condition_filter, brand_filter=brand_filter,
                            whatsapp_num=WHATSAPP_NUM)
 
-# ─── ADMIN ───────────────────────────────────────────────────
-
 @app.route('/admin/<token>')
 def admin(token):
     check_token(token)
@@ -122,13 +132,18 @@ def admin(token):
 def add_mobile(token):
     check_token(token)
     if request.method == 'POST':
+        uploaded_files = request.files.getlist('images')
+        image_paths = save_uploaded_images(uploaded_files)
+        primary_image = image_paths[0] if image_paths else ''
+        images_json_str = json.dumps(image_paths)
+
         conn = get_db()
         conn.execute(
-            'INSERT INTO mobiles (name,brand,condition,price,storage,ram,color,description,image_url,youtube_url) VALUES (?,?,?,?,?,?,?,?,?,?)',
+            'INSERT INTO mobiles (name,brand,condition,price,storage,ram,color,description,image_url,images_json,youtube_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
             (request.form['name'], request.form['brand'], request.form['condition'],
              request.form['price'], request.form['storage'], request.form['ram'],
              request.form['color'], request.form['description'],
-             request.form.get('image_url',''), request.form.get('youtube_url',''))
+             primary_image, images_json_str, request.form.get('youtube_url',''))
         )
         conn.commit(); conn.close()
         flash('تم إضافة الموبايل بنجاح! ✅','success')
@@ -142,12 +157,19 @@ def edit_mobile(token, id):
     mobile = conn.execute('SELECT * FROM mobiles WHERE id=?', (id,)).fetchone()
     if not mobile: abort(404)
     if request.method == 'POST':
+        uploaded_files = request.files.getlist('images')
+        new_paths = save_uploaded_images(uploaded_files)
+        kept_images = request.form.getlist('keep_images')
+        all_images = kept_images + new_paths
+        images_json_str = json.dumps(all_images)
+        primary_image = all_images[0] if all_images else ''
+
         conn.execute(
-            'UPDATE mobiles SET name=?,brand=?,condition=?,price=?,storage=?,ram=?,color=?,description=?,image_url=?,youtube_url=? WHERE id=?',
+            'UPDATE mobiles SET name=?,brand=?,condition=?,price=?,storage=?,ram=?,color=?,description=?,image_url=?,images_json=?,youtube_url=? WHERE id=?',
             (request.form['name'], request.form['brand'], request.form['condition'],
              request.form['price'], request.form['storage'], request.form['ram'],
              request.form['color'], request.form['description'],
-             request.form.get('image_url',''), request.form.get('youtube_url',''), id)
+             primary_image, images_json_str, request.form.get('youtube_url',''), id)
         )
         conn.commit(); conn.close()
         flash('تم تعديل الموبايل بنجاح! ✅','success')
@@ -164,8 +186,6 @@ def delete_mobile(token, id):
     flash('تم حذف الموبايل! 🗑️','success')
     return redirect(url_for('admin', token=token))
 
-# ─── تسجيل بيع ───────────────────────────────────────────────
-
 @app.route('/admin/<token>/sell/<int:id>', methods=['POST'])
 def sell_mobile(token, id):
     check_token(token)
@@ -173,12 +193,10 @@ def sell_mobile(token, id):
     mobile = conn.execute('SELECT * FROM mobiles WHERE id=?', (id,)).fetchone()
     if not mobile: abort(404)
     notes = request.form.get('notes', '')
-    # سجّل في sales
     conn.execute(
         'INSERT INTO sales (mobile_id,name,brand,condition,price,notes) VALUES (?,?,?,?,?,?)',
         (mobile['id'], mobile['name'], mobile['brand'], mobile['condition'], mobile['price'], notes)
     )
-    # احذفه من المخزون
     conn.execute('DELETE FROM mobiles WHERE id=?', (id,))
     conn.commit(); conn.close()
     flash(f'✅ تم تسجيل بيع «{mobile["name"]}» بنجاح وإزالته من المخزون!','success')
@@ -198,6 +216,16 @@ def delete_sale(token, id):
 def admin_bare():
     abort(404)
 
-if __name__ == '__main__':
+# ─── Jinja2 filters ───────────────────────────────────────────
+@app.template_filter('fromjson')
+def fromjson_filter(s):
+    try:
+        return json.loads(s) if s else []
+    except Exception:
+        return []
+
+with app.app_context():
     init_db()
+
+if __name__ == '__main__':
     app.run(debug=False)

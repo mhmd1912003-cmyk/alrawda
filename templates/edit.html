@@ -2,45 +2,102 @@
 {% block title %}تعديل موبايل — الروضة{% endblock %}
 {% block extra_styles %}
 <style>
-    .form-page { padding:1.2rem 1rem 3rem; }
-    .form-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:1.5rem 1.2rem; }
-    .form-title { font-size:1.35rem; font-weight:900; margin-bottom:.35rem; }
+    .form-page { max-width:700px; margin:3rem auto; padding:0 1.5rem 4rem; }
+    .form-card { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:2.5rem; }
+    .form-title { font-size:1.6rem; font-weight:900; margin-bottom:.5rem; }
     .form-title span { color:#4dabf7; }
-    .form-subtitle { color:var(--text-muted); font-size:.85rem; margin-bottom:1.5rem; }
-    .form-grid { display:flex; flex-direction:column; gap:1rem; }
-    .form-group { display:flex; flex-direction:column; gap:5px; }
-    label { font-size:.82rem; font-weight:700; color:var(--text-muted); }
-    input,select,textarea {
-        background:var(--surface2); border:1px solid var(--border); border-radius:10px;
-        padding:12px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:1rem;
-        outline:none; transition:border-color .2s; direction:rtl;
-        -webkit-appearance:none; min-height:var(--tap-min);
-    }
+    .form-subtitle { color:var(--text-muted); font-size:.9rem; margin-bottom:2rem; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:.85rem; font-weight:700; color:var(--text-muted); }
+    input,select,textarea { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:11px 14px; color:var(--text); font-family:'Cairo',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s; direction:rtl; width:100%; box-sizing:border-box; }
     input:focus,select:focus,textarea:focus { border-color:#4dabf7; }
     textarea { resize:vertical; min-height:90px; }
-    select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a8599' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:left 12px center; }
-    .form-actions { display:flex; flex-direction:column; gap:10px; margin-top:1.5rem; }
-    .form-actions .btn { width:100%; justify-content:center; }
+    .form-actions { display:flex; gap:12px; margin-top:2rem; justify-content:flex-end; }
     .btn-cancel { background:var(--surface2); color:var(--text-muted); border:1px solid var(--border); }
     .btn-save { background:linear-gradient(135deg,#4dabf7,#339af0); color:#fff; }
-    @media (min-width:600px) {
-        .form-page { max-width:700px; margin:2.5rem auto; }
-        .form-card { padding:2.5rem; }
-        .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
-        .form-group.full { grid-column:1/-1; }
-        .form-actions { flex-direction:row; justify-content:flex-end; }
-        .form-actions .btn { width:auto; }
+    .btn-save:hover { transform:translateY(-2px); }
+
+    /* ─── Existing Images ─── */
+    .existing-label { font-size:.85rem; font-weight:700; color:var(--text-muted); margin-bottom:.6rem; display:block; }
+    .existing-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(100px,1fr));
+        gap:10px;
+        margin-bottom:1rem;
     }
+    .existing-item {
+        position:relative;
+        border-radius:10px;
+        overflow:hidden;
+        aspect-ratio:1;
+        border:2px solid var(--border);
+    }
+    .existing-item img { width:100%; height:100%; object-fit:cover; }
+    .existing-item input[type=checkbox] { display:none; }
+    .existing-item .overlay {
+        position:absolute; inset:0;
+        background:rgba(220,50,50,.7);
+        display:flex; align-items:center; justify-content:center;
+        opacity:0; transition:opacity .2s;
+        font-size:1.5rem; cursor:pointer;
+    }
+    .existing-item.deleted .overlay { opacity:1; }
+    .existing-item .del-btn {
+        position:absolute; top:4px; right:4px;
+        width:22px; height:22px;
+        background:rgba(220,50,50,.85);
+        border:none; border-radius:50%;
+        color:#fff; font-size:13px;
+        cursor:pointer; display:flex;
+        align-items:center; justify-content:center;
+        transition:transform .2s; padding:0;
+    }
+    .existing-item .del-btn:hover { transform:scale(1.2); }
+    .existing-item .main-badge {
+        position:absolute; bottom:4px; right:4px;
+        background:#4dabf7; color:#000;
+        font-size:.6rem; font-weight:800;
+        padding:2px 6px; border-radius:6px;
+    }
+    .no-existing { font-size:.85rem; color:var(--text-muted); font-style:italic; margin-bottom:1rem; }
+
+    /* ─── Upload Zone ─── */
+    .upload-zone {
+        border:2px dashed var(--border); border-radius:14px;
+        padding:1.5rem; text-align:center; cursor:pointer;
+        transition:all .3s; background:var(--surface2); position:relative;
+    }
+    .upload-zone:hover,.upload-zone.drag-over { border-color:#4dabf7; background:rgba(77,171,247,.05); }
+    .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .upload-icon { font-size:2rem; margin-bottom:.3rem; }
+    .upload-text { font-weight:700; color:var(--text); font-size:.9rem; }
+    .upload-hint { font-size:.78rem; color:var(--text-muted); }
+    .upload-count { margin-top:.4rem; font-size:.82rem; color:#4dabf7; font-weight:700; }
+    .preview-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(100px,1fr)); gap:10px; margin-top:1rem; }
+    .preview-item { position:relative; border-radius:10px; overflow:hidden; aspect-ratio:1; background:var(--surface2); border:2px solid var(--border); }
+    .preview-item img { width:100%; height:100%; object-fit:cover; }
+    .preview-item .remove-btn { position:absolute; top:4px; right:4px; width:22px; height:22px; background:rgba(220,50,50,.9); border:none; border-radius:50%; color:#fff; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .2s; padding:0; }
+    .preview-item .remove-btn:hover { transform:scale(1.2); }
+    .preview-item .new-badge { position:absolute; bottom:4px; right:4px; background:#2ecc71; color:#000; font-size:.6rem; font-weight:800; padding:2px 6px; border-radius:6px; }
 </style>
 {% endblock %}
 {% block content %}
+{% set existing_images = [] %}
+{% if mobile.images_json %}
+    {% set existing_images = mobile.images_json | tojson | fromjson %}
+{% elif mobile.image_url %}
+    {% set existing_images = [mobile.image_url] %}
+{% endif %}
+
 <div class="form-page">
     <div class="form-card">
         <h1 class="form-title">✏️ تعديل <span>بيانات الجهاز</span></h1>
         <p class="form-subtitle">{{ mobile.name }}</p>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <div class="form-grid">
-                <div class="form-group full"><label>📱 اسم الجهاز *</label><input type="text" name="name" value="{{ mobile.name }}" required autocomplete="off"></div>
+                <div class="form-group full"><label>📱 اسم الجهاز *</label><input type="text" name="name" value="{{ mobile.name }}" required></div>
                 <div class="form-group"><label>🏷️ الماركة *</label>
                     <select name="brand" required>{% for b in ['Samsung','Apple','Realme','Xiaomi','Oppo','Huawei','Vivo','Nokia','Other'] %}<option value="{{ b }}" {% if mobile.brand==b %}selected{% endif %}>{{ b }}</option>{% endfor %}</select>
                 </div>
@@ -51,7 +108,7 @@
                         <option value="used" {% if mobile.condition=='used' %}selected{% endif %}>🔄 مستعمل</option>
                     </select>
                 </div>
-                <div class="form-group"><label>💰 السعر (جنيه) *</label><input type="number" name="price" value="{{ mobile.price }}" min="0" step="0.01" required inputmode="decimal"></div>
+                <div class="form-group"><label>💰 السعر (جنيه) *</label><input type="number" name="price" value="{{ mobile.price }}" min="0" step="0.01" required></div>
                 <div class="form-group"><label>🎨 اللون</label><input type="text" name="color" value="{{ mobile.color or '' }}"></div>
                 <div class="form-group"><label>💾 التخزين</label>
                     <select name="storage">{% for s in ['','32GB','64GB','128GB','256GB','512GB','1TB'] %}<option value="{{ s }}" {% if mobile.storage==s %}selected{% endif %}>{{ s or '—' }}</option>{% endfor %}</select>
@@ -59,8 +116,40 @@
                 <div class="form-group"><label>⚡ الرام</label>
                     <select name="ram">{% for r in ['','3GB','4GB','6GB','8GB','12GB','16GB'] %}<option value="{{ r }}" {% if mobile.ram==r %}selected{% endif %}>{{ r or '—' }}</option>{% endfor %}</select>
                 </div>
-                <div class="form-group full"><label>🖼️ رابط الصورة</label><input type="url" name="image_url" value="{{ mobile.image_url or '' }}" inputmode="url"></div>
-                <div class="form-group full"><label>▶️ رابط مراجعة يوتيوب</label><input type="url" name="youtube_url" value="{{ mobile.youtube_url or '' }}" placeholder="https://youtube.com/watch?v=..." inputmode="url"></div>
+
+                <!-- صور موجودة -->
+                <div class="form-group full">
+                    <span class="existing-label">🖼️ الصور الحالية (اضغط ✕ لحذف صورة)</span>
+                    {% set imgs = [] %}
+                    {% if mobile.images_json %}{% set imgs = mobile.images_json | fromjson %}{% elif mobile.image_url %}{% set imgs = [mobile.image_url] %}{% endif %}
+                    {% if imgs %}
+                    <div class="existing-grid" id="existingGrid">
+                        {% for img in imgs %}
+                        <div class="existing-item" id="ei_{{ loop.index0 }}">
+                            <img src="{{ img }}" alt="">
+                            <input type="checkbox" name="keep_images" value="{{ img }}" checked id="chk_{{ loop.index0 }}">
+                            <button type="button" class="del-btn" onclick="removeExisting({{ loop.index0 }})">✕</button>
+                            {% if loop.first %}<span class="main-badge">رئيسية</span>{% endif %}
+                            <div class="overlay">🗑️</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="no-existing">لا توجد صور مضافة سابقاً</p>
+                    {% endif %}
+
+                    <!-- رفع صور جديدة -->
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" name="images" id="imagesInput" multiple accept="image/*">
+                        <div class="upload-icon">➕</div>
+                        <div class="upload-text">أضف صور جديدة</div>
+                        <div class="upload-hint">اسحب أو اضغط للاختيار</div>
+                        <div class="upload-count" id="uploadCount"></div>
+                    </div>
+                    <div class="preview-grid" id="previewGrid"></div>
+                </div>
+
+                <div class="form-group full"><label>▶️ رابط مراجعة يوتيوب</label><input type="text" name="youtube_url" value="{{ mobile.youtube_url or '' }}" placeholder="https://youtube.com/watch?v=..."></div>
                 <div class="form-group full"><label>📝 الوصف</label><textarea name="description">{{ mobile.description or '' }}</textarea></div>
             </div>
             <div class="form-actions">
@@ -70,4 +159,52 @@
         </form>
     </div>
 </div>
+
+<script>
+function removeExisting(i) {
+    const item = document.getElementById('ei_'+i);
+    const chk  = document.getElementById('chk_'+i);
+    if (chk.checked) { chk.checked = false; item.classList.add('deleted'); }
+    else { chk.checked = true; item.classList.remove('deleted'); }
+}
+
+const input = document.getElementById('imagesInput');
+const grid  = document.getElementById('previewGrid');
+const count = document.getElementById('uploadCount');
+const zone  = document.getElementById('uploadZone');
+let dt = new DataTransfer();
+
+function refresh() {
+    grid.innerHTML = '';
+    const files = Array.from(dt.files);
+    count.textContent = files.length ? `${files.length} صورة جديدة` : '';
+    files.forEach((file, i) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const item = document.createElement('div');
+            item.className = 'preview-item';
+            item.innerHTML = `<img src="${e.target.result}" alt=""><button type="button" class="remove-btn" data-i="${i}">✕</button><span class="new-badge">جديد</span>`;
+            item.querySelector('.remove-btn').onclick = () => {
+                const nd = new DataTransfer();
+                Array.from(dt.files).forEach((f,j) => { if(j!==i) nd.items.add(f); });
+                dt = nd; input.files = dt.files; refresh();
+            };
+            grid.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+input.addEventListener('change', () => {
+    Array.from(input.files).forEach(f => dt.items.add(f));
+    input.files = dt.files; refresh();
+});
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    Array.from(e.dataTransfer.files).forEach(f => { if(f.type.startsWith('image/')) dt.items.add(f); });
+    input.files = dt.files; refresh();
+});
+</script>
 {% endblock %}
