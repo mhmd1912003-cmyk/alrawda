@@ -1,37 +1,134 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, send_from_directory
 import sqlite3, os, urllib.parse, uuid, json
 from werkzeug.utils import secure_filename
+from PIL import Image, ImageOps
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'rawda-secret-2024')
 
-ADMIN_TOKEN   = os.environ.get('ADMIN_TOKEN', '1912003')
-WHATSAPP_NUM  = os.environ.get('WHATSAPP_NUM', '201094918310')
+ADMIN_TOKEN   = os.environ.get('ADMIN_TOKEN', 'rawda2024xK9')
+WHATSAPP_NUM  = os.environ.get('WHATSAPP_NUM', '201000000000')
 
-DB_PATH       = os.path.join(os.path.dirname(__file__), 'rawda.db')
-UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
-ALLOWED_EXTS  = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+DB_PATH        = os.path.join(os.path.dirname(__file__), 'rawda.db')
+UPLOAD_FOLDER  = os.path.join(os.path.dirname(__file__), 'uploads')
+THUMBS_FOLDER  = os.path.join(UPLOAD_FOLDER, 'thumbs')
+ALLOWED_EXTS   = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+# Max dimensions used when resizing uploaded photos. Phone camera photos can be
+# 4000x3000+ and several MB each; there's no reason to ship that much data to
+# a card that renders at ~200px tall. These caps are what actually fix the
+# "images take forever to load" problem.
+FULL_MAX_DIM  = 1600   # used for the modal / full-size view
+THUMB_MAX_DIM = 480    # used for the grid cards
+FULL_QUALITY  = 82
+THUMB_QUALITY = 72
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(THUMBS_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024  # 40MB
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTS
 
+def _resize_to_max(img, max_dim):
+    w, h = img.size
+    if max(w, h) <= max_dim:
+        return img
+    if w >= h:
+        new_w, new_h = max_dim, round(h * max_dim / w)
+    else:
+        new_h, new_w = max_dim, round(w * max_dim / h)
+    return img.resize((new_w, new_h), Image.LANCZOS)
+
+def _make_thumb_from_full(full_path, thumb_path):
+    """Build a small compressed WEBP thumbnail from an already-saved full image."""
+    with Image.open(full_path) as img:
+        img = ImageOps.exif_transpose(img)
+        if img.mode not in ('RGB', 'RGBA'):
+            img = img.convert('RGB')
+        thumb = _resize_to_max(img, THUMB_MAX_DIM)
+        thumb.save(thumb_path, 'WEBP', quality=THUMB_QUALITY, method=6)
+
 def save_uploaded_images(files):
+    """Save uploaded images, compressing/resizing them and generating a
+    matching small thumbnail so the grid view doesn't have to load full-size
+    camera photos."""
     saved = []
     for f in files:
-        if f and f.filename and allowed_file(f.filename):
-            ext = f.filename.rsplit('.', 1)[1].lower()
-            fname = f"{uuid.uuid4().hex}.{ext}"
+        if not (f and f.filename and allowed_file(f.filename)):
+            continue
+        ext = f.filename.rsplit('.', 1)[1].lower()
+        base = uuid.uuid4().hex
+
+        if ext == 'gif':
+            # Animated GIFs: keep as-is (resizing/re-encoding would lose the
+            # animation), just save and use the same file as its own thumb.
+            fname = f"{base}.gif"
+            full_path = os.path.join(UPLOAD_FOLDER, fname)
+            f.save(full_path)
+            thumb_path = os.path.join(THUMBS_FOLDER, fname)
+            try:
+                import shutil
+                shutil.copyfile(full_path, thumb_path)
+            except Exception:
+                pass
+            saved.append(f"/uploads/{fname}")
+            continue
+
+        try:
+            img = Image.open(f.stream)
+            img = ImageOps.exif_transpose(img)  # respect camera orientation
+            if img.mode not in ('RGB', 'RGBA'):
+                img = img.convert('RGB')
+
+            fname = f"{base}.webp"
+            full_path = os.path.join(UPLOAD_FOLDER, fname)
+            full_img = _resize_to_max(img, FULL_MAX_DIM)
+            full_img.save(full_path, 'WEBP', quality=FULL_QUALITY, method=6)
+
+            thumb_path = os.path.join(THUMBS_FOLDER, fname)
+            thumb_img = _resize_to_max(img, THUMB_MAX_DIM)
+            thumb_img.save(thumb_path, 'WEBP', quality=THUMB_QUALITY, method=6)
+
+            saved.append(f"/uploads/{fname}")
+        except Exception:
+            # Fallback: if Pillow can't read it for some reason, save the raw file
+            fname = f"{base}.{ext}"
+            f.stream.seek(0)
             f.save(os.path.join(UPLOAD_FOLDER, fname))
             saved.append(f"/uploads/{fname}")
     return saved
 
+@app.route('/uploads/thumb/<filename>')
+def uploaded_thumb(filename):
+    """Serve a small thumbnail. If one doesn't exist yet (e.g. images
+    uploaded before this optimization was added), generate it on the fly
+    from the original and cache it for next time."""
+    thumb_path = os.path.join(THUMBS_FOLDER, filename)
+    if not os.path.exists(thumb_path):
+        orig_path = os.path.join(UPLOAD_FOLDER, filename)
+        if os.path.exists(orig_path):
+            try:
+                _make_thumb_from_full(orig_path, thumb_path)
+            except Exception:
+                abort(404)
+        else:
+            abort(404)
+    return send_from_directory(THUMBS_FOLDER, filename, max_age=60 * 60 * 24 * 30)
+
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
+    return send_from_directory(UPLOAD_FOLDER, filename, max_age=60 * 60 * 24 * 30)
+
+@app.template_filter('thumb')
+def thumb_filter(path):
+    """Convert an /uploads/xxx path to its small thumbnail equivalent for use
+    in the grid view. External URLs (e.g. placeholder images) pass through."""
+    if not path or not path.startswith('/uploads/') or path.startswith('/uploads/thumb/'):
+        return path
+    filename = path.rsplit('/', 1)[-1]
+    return f'/uploads/thumb/{filename}'
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)

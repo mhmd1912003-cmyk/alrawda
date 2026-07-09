@@ -20,6 +20,7 @@
     /* FILTER */
     .filter-section { background:var(--surface); border-bottom:1px solid var(--border); padding:1.2rem 2rem; position:sticky; top:70px; z-index:50; }
     .filter-inner { max-width:1300px; margin:0 auto; display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+    .filter-row { display:flex; align-items:center; gap:.7rem; }
     .filter-label { font-weight:700; color:var(--text-muted); font-size:.9rem; white-space:nowrap; }
     .filter-pills { display:flex; gap:8px; flex-wrap:wrap; }
     .pill { padding:7px 16px; border-radius:30px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; font-family:'Cairo',sans-serif; font-weight:600; font-size:.85rem; text-decoration:none; transition:all .2s; }
@@ -29,6 +30,24 @@
     .pill-like.active { background:var(--like-new-color); border-color:var(--like-new-color); }
     .pill-used.active { background:var(--used-color); border-color:var(--used-color); }
     .divider-pill { width:1px; height:24px; background:var(--border); align-self:center; }
+
+    /* FILTER — MOBILE: collapse the wrapped pill grid into single scrollable rows */
+    @media (max-width: 640px) {
+        .filter-section { padding:.7rem 0; top:54px; }
+        .filter-inner { flex-direction:column; align-items:stretch; gap:.5rem; }
+        .filter-row { padding:0 1rem; }
+        .divider-pill { display:none; }
+        .filter-pills {
+            flex-wrap:nowrap;
+            overflow-x:auto;
+            scrollbar-width:none;
+            -ms-overflow-style:none;
+            -webkit-overflow-scrolling:touch;
+            padding-left:1rem; /* extra scroll room past the edge, RTL-aware via margin below */
+        }
+        .filter-pills::-webkit-scrollbar { display:none; }
+        .filter-pills .pill { flex:0 0 auto; }
+    }
 
     /* CONTENT */
     .content { max-width:1300px; margin:0 auto; padding:2rem; }
@@ -187,18 +206,22 @@
 
 <div class="filter-section">
     <div class="filter-inner">
-        <span class="filter-label">🔍 الحالة:</span>
-        <div class="filter-pills">
-            <a href="/?condition=all&brand={{ brand_filter }}" class="pill {% if condition_filter=='all' %}active{% endif %}">الكل</a>
-            <a href="/?condition=new&brand={{ brand_filter }}" class="pill pill-new {% if condition_filter=='new' %}active{% endif %}">✨ جديد</a>
-            <a href="/?condition=like_new&brand={{ brand_filter }}" class="pill pill-like {% if condition_filter=='like_new' %}active{% endif %}">💎 شبه جديد</a>
-            <a href="/?condition=used&brand={{ brand_filter }}" class="pill pill-used {% if condition_filter=='used' %}active{% endif %}">🔄 مستعمل</a>
+        <div class="filter-row">
+            <span class="filter-label">🔍 الحالة:</span>
+            <div class="filter-pills">
+                <a href="/?condition=all&brand={{ brand_filter }}" class="pill {% if condition_filter=='all' %}active{% endif %}">الكل</a>
+                <a href="/?condition=new&brand={{ brand_filter }}" class="pill pill-new {% if condition_filter=='new' %}active{% endif %}">✨ جديد</a>
+                <a href="/?condition=like_new&brand={{ brand_filter }}" class="pill pill-like {% if condition_filter=='like_new' %}active{% endif %}">💎 شبه جديد</a>
+                <a href="/?condition=used&brand={{ brand_filter }}" class="pill pill-used {% if condition_filter=='used' %}active{% endif %}">🔄 مستعمل</a>
+            </div>
         </div>
         {% if brands %}<div class="divider-pill"></div>
-        <span class="filter-label">📱 الماركة:</span>
-        <div class="filter-pills">
-            <a href="/?condition={{ condition_filter }}&brand=all" class="pill {% if brand_filter=='all' %}active{% endif %}">الكل</a>
-            {% for b in brands %}<a href="/?condition={{ condition_filter }}&brand={{ b }}" class="pill {% if brand_filter==b %}active{% endif %}">{{ b }}</a>{% endfor %}
+        <div class="filter-row">
+            <span class="filter-label">📱 الماركة:</span>
+            <div class="filter-pills">
+                <a href="/?condition={{ condition_filter }}&brand=all" class="pill {% if brand_filter=='all' %}active{% endif %}">الكل</a>
+                {% for b in brands %}<a href="/?condition={{ condition_filter }}&brand={{ b }}" class="pill {% if brand_filter==b %}active{% endif %}">{{ b }}</a>{% endfor %}
+            </div>
         </div>{% endif %}
     </div>
 </div>
@@ -245,7 +268,7 @@
                             {% endif %}
                             {% for img in imgs %}
                             <img class="slide-img {% if loop.first %}active{% endif %}"
-                                 src="{{ img }}" alt="{{ m.name }}" loading="lazy"
+                                 src="{{ img|thumb }}" alt="{{ m.name }}" loading="lazy"
                                  data-index="{{ loop.index0 }}"
                                  onerror="this.style.display='none'">
                             {% endfor %}
